@@ -28,9 +28,34 @@ use Wibble;
 class SanitizeTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testescape()
+    /**
+     * Test Helpers
+     */
+    
+    protected function sanitizeHTML($string)
     {
-        
+        $fragment = new Wibble\HTML\Fragment($string);
+        $fragment->scrub('escape');
+        return $fragment->toString();
+    }
+    
+    protected function checkSanitizationOfNormalTag($tag)
+    {
+        $input       = "<{$tag} title=\"1\">foo <bad>bar</bad> baz</{$tag}>";
+        $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
+        $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
+        $rexmlOutput = $xhtmlOutput;
+        $sane = $this->sanitizeHTML($input);
+        $this->assertTrue(($htmlOutput == $sane || $xhtmlOutput == $sane || $rexmlOutput == $sane), $input);
+    }
+
+    /**
+     * Test allowed tags
+     */
+    
+    public function testAllowsATag()
+    {
+        $this->checkSanitizationOfNormalTag('a');
     }
 
 }

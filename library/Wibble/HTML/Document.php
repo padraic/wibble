@@ -60,7 +60,7 @@ class Document
         if ($scrubber instanceof Wibble\Scrubber\Scrubbable) {
             return $scrubber;
         } elseif (is_string($scrubber)) {
-            if (in_array($scrubber, array('Strip'))) { // delegate out from explicit strings
+            if (in_array($scrubber, array('Strip', 'Escape'))) { // delegate out from explicit strings
                 $class = 'Wibble\\Scrubber\\' . $scrubber;
                 $return = new $class;
                 return $return;

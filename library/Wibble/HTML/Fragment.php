@@ -21,21 +21,31 @@
 /**
  * @namespace
  */
-namespace Wibble\Scrubber;
+namespace Wibble\HTML;
 use Wibble;
 
-class Escape extends AbstractScrubber
+class Fragment extends Document
 {
-    
-    public function scrub(\DOMNode $node)
+
+    public function __toString()
     {
-        if ($this->_sanitize($node) == AbstractScrubber::GO) {
-            return AbstractScrubber::GO;
+        $xpath = new \DOMXPath($this->getDOM());
+        $result = $xpath->query('/html/body');
+        return $this->_getInnerHTML($result->item(0));
+    }
+    
+    protected function _getInnerHTML(\DOMNode $node)
+    {
+        $dom = new \DOMDocument;
+        $dom->preserveWhitespace = false;
+        $dom->formatOutput = true;
+        $children = $node->childNodes;
+        if (!is_null($children) && $children->length > 0) {
+            foreach ($children as $child) {
+                $dom->appendChild($dom->importNode($child, true));
+            }
         }
-        $replacementText = Wibble\Utility::nodeToString($node);
-        $replacementNode = $node->ownerDocument->createTextNode($replacementText);
-        $node->parentNode->insertBefore($replacementNode, $node);
-        $node->parentNode->removeChild($node);
+        return trim($dom->saveHTML());
     }
 
 }

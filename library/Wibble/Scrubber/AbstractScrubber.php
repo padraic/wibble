@@ -90,8 +90,8 @@ abstract class AbstractScrubber implements Scrubbable
             case XML_ELEMENT_NODE:
                 if (in_array($node->tagName, $tagsAllowed)) {
                     $this->_sanitizeAttributes($node);
+                    return self::GO;
                 }
-                return self::GO;
                 break;
             case XML_TEXT_NODE:
             case XML_CDATA_SECTION_NODE:
@@ -103,13 +103,18 @@ abstract class AbstractScrubber implements Scrubbable
     
     protected function _sanitizeAttributes(\DOMNode $node)
     {
+        $allowedAttributes = array_merge(
+            Whitelist::$acceptableAttributes,
+            Whitelist::$mathmlAttributes,
+            Whitelist::$svgAttributes
+        );
         foreach ($node->attributes as $attribute) {
-            if (!is_null($attribute->prefix)) {
-                $name = $attribute->prefix . ':' . $attribute->tagName;
+            if (!empty($attribute->prefix)) {
+                $name = $attribute->prefix . ':' . $attribute->name;
             } else {
-                $name = $attribute->tagName;
+                $name = $attribute->name;
             }
-            if (!in_array($name, Whitelist::$allowedAttributes)) {
+            if (!in_array($name, $allowedAttributes)) {
                 $node->removeAttributeNode($attribute);
                 return;
             }
@@ -174,48 +179,6 @@ abstract class AbstractScrubber implements Scrubbable
             }
         }
         return implode(' ', $clean);
-    }
-    
-    protected function _elementToString(\DOMNode $node)
-    {
-        if ($node->nodeType == XML_CDATA_SECTION_NODE) {
-            return '<![CDATA[' . $node->nodeValue . ']]&gt;';
-        }
-        if (preg_match("/^\#/", $node->tagName)) {
-            return '';
-        }
-        $string = '<' . $node->tagName;
-        $attributes = $node->attributes;
-        if (!is_null($attributes)) {
-            foreach ($attributes as $attribute) {
-                $string .= ' ' . $attribute->name . '="' . $attribute->value . '"';
-            }
-        }
-        $children = $node->childNodes;
-        if (is_null($children) || $children->length == 0) {
-            $text = $node->textContent;
-            if (!is_null($text) && $text !== '') {
-                $string .= $text . '</' . $node->tagName . '>';
-            } else {
-                $string .= '/>';
-            }
-        } else {
-            $string .= '>';
-            $hasValidChildren = false;
-            for ($i=0;$i<$children->length;$i++) {
-                $childToString = $this->_elementToString($children->item($i));
-                if ($childToString !== '') {
-                    $string .= $childToString;
-                    $hasValidChildren = true;
-                }
-            }
-            $text = $node->textContent;
-            if (!$hasValidChildren && !is_null($text)) {
-                $string .= $text;
-            }
-            $string .= '</' . $node->tagName . '>';
-        }
-        return $string;
     }
 
 }

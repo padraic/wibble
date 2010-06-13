@@ -69,7 +69,6 @@ class DocTest extends \PHPUnit_Framework_TestCase
     {
         $doc = new Wibble\HTML\Document($this->fragment);
         $this->assertEquals($this->fragment, $this->getInnerHTMLFrom($doc->getDOM(), '/html/body'));
-        var_dump($doc->getDOM()->actualEncoding); exit;
     }
 
 }

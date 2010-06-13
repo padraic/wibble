@@ -21,7 +21,7 @@
 /**
  * @namespace
  */
-namespace Wibble\HTML;
+namespace Wibble\Scrubber;
 use Wibble;
 
 /**
@@ -106,8 +106,6 @@ class Whitelist
         'size', 'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target',
         'title', 'type', 'usemap', 'valign', 'value', 'vspace', 'width', 'xml:lang'
     );
-    
-    public static $tagsSafeWithLibxml2 = array('html', 'head', 'body');
     
     public static $mathmlAttributes = array(
         'actiontype', 'align', 'close', 'columnalign', 'columnalign',
