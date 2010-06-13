@@ -31,8 +31,18 @@ abstract class AbstractScrubber implements Scrubbable
     
     const STOP = 'stop';
     
+    protected $_direction = 'top_down';
+    
     public function traverse(\DOMNode $node) {
         $this->_traverseTopDown($node);
+    }
+    
+    public function setDirection($direction)
+    {
+        if ($direction !== 'top_down' && $direction !== 'bottom_up') {
+            throw new Wibble\Exception('Invalid traversal direction. Try "top_down" or "bottom_up"');
+        }
+        $this->_direction = $direction;
     }
     
     protected function _traverseTopDown(\DOMNode $node)
@@ -45,6 +55,19 @@ abstract class AbstractScrubber implements Scrubbable
             foreach ($children as $child) {
                 $this->_traverseTopDown($child);
             }
+        }
+    }
+    
+    protected function _traverseBottomUp(\DOMNode $node)
+    {
+        $children = $node->childNodes;
+        if (!is_null($children) && $children->length > 0) {
+            foreach ($children as $child) {
+                $this->_traverseBottomUp($child);
+            }
+        }
+        if ($this->scrub($node) == self::STOP) {
+            return;
         }
     }
     

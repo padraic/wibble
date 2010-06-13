@@ -35,27 +35,78 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
         $this->document = '<html><head><link></link></head><body><span>hello</span><span>goodbye</span></body></html>';
         $this->fragmentNodeCount = 4 + 2; // +2 refers to #html and #body added by libxml2 to fragments
         $this->documentNodeCount = 8;
-        $this->fragmentTopDownStopCount = 2;
+        $this->fragmentTopDownStopCount = 2 - 1; // -1 refers again to libxml2's additions to fragments
         $this->documentTopDownStopCount = 1;
         $self =& $this;
-        $this->scrubber = new Wibble\Scrubber\Closure(function($node) use ($self) {
+        $this->scrubberGo = new Wibble\Scrubber\Closure(function($node) use ($self) {
             $self->count += 1;
             return \Wibble\Scrubber\AbstractScrubber::GO;
         });
+        $this->scrubberStop = new Wibble\Scrubber\Closure(function($node) use ($self) {
+            $self->count += 1;
+            return \Wibble\Scrubber\AbstractScrubber::STOP;
+        });
+        $this->scrubberNoFlag = new Wibble\Scrubber\Closure(function($node) use ($self) {
+            $self->count += 1;
+        });
+        $this->scrubberBottomUp = new Wibble\Scrubber\Closure(function($node) use ($self) {
+            $self->count += 1;
+        }, 'bottom_up');
     }
     
-    public function testOperatesProperlyOnFragments()
+    public function testGoOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->filterUsing($this->scrubber);
+        $document->filterUsing($this->scrubberGo);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
-    public function testOperatesProperlyOnDocuments()
+    public function testGoOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->filterUsing($this->scrubber);
+        $document->filterUsing($this->scrubberGo);
         $this->assertEquals($this->documentNodeCount, $this->count);
+    }
+    
+    public function testStopOperatesProperlyOnFragments()
+    {
+        $document = new Wibble\HTML\Document($this->fragment);
+        $document->filterUsing($this->scrubberStop);
+        $this->assertEquals($this->fragmentTopDownStopCount, $this->count);
+    }
+    
+    public function testStopOperatesProperlyOnDocuments()
+    {
+        $document = new Wibble\HTML\Document($this->document);
+        $document->filterUsing($this->scrubberStop);
+        $this->assertEquals($this->documentTopDownStopCount, $this->count);
+    }
+    
+    public function testNoFlagOperatesProperlyOnFragments()
+    {
+        $document = new Wibble\HTML\Document($this->fragment);
+        $document->filterUsing($this->scrubberNoFlag);
+        $this->assertEquals($this->fragmentNodeCount, $this->count);
+    }
+    
+    public function testBottomUpOperatesProperlyOnFragments()
+    {
+        $document = new Wibble\HTML\Document($this->fragment);
+        $document->filterUsing($this->scrubberBottomUp);
+        $this->assertEquals($this->fragmentNodeCount, $this->count);
+    }
+    
+    public function testBottomUpOperatesProperlyOnDocuments()
+    {
+        $document = new Wibble\HTML\Document($this->document);
+        $document->filterUsing($this->scrubberBottomUp);
+        $this->assertEquals($this->documentNodeCount, $this->count);
+    }
+    
+    public function testBadTraversalDirectionThrowsException()
+    {
+        $this->setExpectedException('Wibble\\Exception');
+        $scrubber = new Wibble\Scrubber\Closure(function($node) {}, 'foo');
     }
 
 }

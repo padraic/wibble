@@ -18,26 +18,9 @@
  * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
  */
  
-/**
- * @namespace
- */
-namespace Wibble\Scrubber;
-use Wibble;
+namespace Wibble;
 
-class Closure extends AbstractScrubber
+class Exception extends \UnexpectedValueException
 {
-    
-    protected $_closure = null;
-    
-    public function __construct(\Closure $closure, $direction = 'top_down')
-    {
-        $this->_closure = $closure;
-        $this->setDirection($direction);
-    }
-    
-    public function scrub(\DOMNode $node)
-    {
-        return call_user_func($this->_closure, $node);
-    }
 
 }
