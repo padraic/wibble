@@ -25,7 +25,7 @@
 namespace WibbleTest;
 use Wibble;
 
-class ScrubbingTest extends \PHPUnit_Framework_TestCase
+class DocTest extends \PHPUnit_Framework_TestCase
 {
 
     public function setUp()
@@ -69,6 +69,7 @@ class ScrubbingTest extends \PHPUnit_Framework_TestCase
     {
         $doc = new Wibble\HTML\Document($this->fragment);
         $this->assertEquals($this->fragment, $this->getInnerHTMLFrom($doc->getDOM(), '/html/body'));
+        var_dump($doc->getDOM()->actualEncoding); exit;
     }
 
 }

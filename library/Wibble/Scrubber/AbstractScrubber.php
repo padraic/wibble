@@ -175,5 +175,47 @@ abstract class AbstractScrubber implements Scrubbable
         }
         return implode(' ', $clean);
     }
+    
+    protected function _elementToString(\DOMNode $node)
+    {
+        if ($node->nodeType == XML_CDATA_SECTION_NODE) {
+            return '<![CDATA[' . $node->nodeValue . ']]&gt;';
+        }
+        if (preg_match("/^\#/", $node->tagName)) {
+            return '';
+        }
+        $string = '<' . $node->tagName;
+        $attributes = $node->attributes;
+        if (!is_null($attributes)) {
+            foreach ($attributes as $attribute) {
+                $string .= ' ' . $attribute->name . '="' . $attribute->value . '"';
+            }
+        }
+        $children = $node->childNodes;
+        if (is_null($children) || $children->length == 0) {
+            $text = $node->textContent;
+            if (!is_null($text) && $text !== '') {
+                $string .= $text . '</' . $node->tagName . '>';
+            } else {
+                $string .= '/>';
+            }
+        } else {
+            $string .= '>';
+            $hasValidChildren = false;
+            for ($i=0;$i<$children->length;$i++) {
+                $childToString = $this->_elementToString($children->item($i));
+                if ($childToString !== '') {
+                    $string .= $childToString;
+                    $hasValidChildren = true;
+                }
+            }
+            $text = $node->textContent;
+            if (!$hasValidChildren && !is_null($text)) {
+                $string .= $text;
+            }
+            $string .= '</' . $node->tagName . '>';
+        }
+        return $string;
+    }
 
 }
