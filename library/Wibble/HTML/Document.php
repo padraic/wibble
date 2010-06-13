@@ -40,11 +40,16 @@ class Document
         libxml_use_internal_errors(false);
     }
     
-    public function filterUsing($scrubber)
+    public function scrub($scrubber)
     {
         $scrubber = $this->_resolve($scrubber);
         $scrubber->traverse($this->_dom->documentElement);
         return $this;
+    }
+    
+    public function getDOM()
+    {
+        return $this->_dom;
     }
 
     protected function _resolve($scrubber)
@@ -55,13 +60,18 @@ class Document
         if ($scrubber instanceof Wibble\Scrubber\Scrubbable) {
             return $scrubber;
         } elseif (is_string($scrubber)) {
-            $class = 'Wibble\\Scrubber\\' . $scrubber;
-            if (class_exists($class)) {
+            if (in_array($scrubber, array('Strip'))) { // delegate out from explicit strings
+                $class = 'Wibble\\Scrubber\\' . $scrubber;
                 $return = new $class;
-                return $return;   
-            }
+                return $return;
+            }   
         }
         throw new Wibble\Exception('Scrubber does not exist: ' . (string) $scrubber);
+    }
+    
+    public function toString()
+    {
+        return (string) $this;
     }
     
     public function __toString()

@@ -57,49 +57,49 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
     public function testGoOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->filterUsing($this->scrubberGo);
+        $document->scrub($this->scrubberGo);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testGoOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->filterUsing($this->scrubberGo);
+        $document->scrub($this->scrubberGo);
         $this->assertEquals($this->documentNodeCount, $this->count);
     }
     
     public function testStopOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->filterUsing($this->scrubberStop);
+        $document->scrub($this->scrubberStop);
         $this->assertEquals($this->fragmentTopDownStopCount, $this->count);
     }
     
     public function testStopOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->filterUsing($this->scrubberStop);
+        $document->scrub($this->scrubberStop);
         $this->assertEquals($this->documentTopDownStopCount, $this->count);
     }
     
     public function testNoFlagOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->filterUsing($this->scrubberNoFlag);
+        $document->scrub($this->scrubberNoFlag);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testBottomUpOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->filterUsing($this->scrubberBottomUp);
+        $document->scrub($this->scrubberBottomUp);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testBottomUpOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->filterUsing($this->scrubberBottomUp);
+        $document->scrub($this->scrubberBottomUp);
         $this->assertEquals($this->documentNodeCount, $this->count);
     }
     
@@ -107,6 +107,13 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Wibble\\Exception');
         $scrubber = new Wibble\Scrubber\Closure(function($node) {}, 'foo');
+    }
+    
+    public function testBadScrubberOnDocumentThrowsException()
+    {
+        $this->setExpectedException('Wibble\\Exception');
+        $document = new Wibble\HTML\Document($this->document);
+        $document->scrub('foo');
     }
 
 }

@@ -33,6 +33,13 @@ abstract class AbstractScrubber implements Scrubbable
     
     protected $_direction = 'top_down';
     
+    public function __construct($direction = null)
+    {
+        if (!is_null($direction)) {
+            $this->setDirection($direction);
+        }
+    }
+    
     public function traverse(\DOMNode $node) {
         $this->_traverseTopDown($node);
     }
@@ -40,7 +47,7 @@ abstract class AbstractScrubber implements Scrubbable
     public function setDirection($direction)
     {
         if ($direction !== 'top_down' && $direction !== 'bottom_up') {
-            throw new Wibble\Exception('Invalid traversal direction. Try "top_down" or "bottom_up"');
+            throw new Wibble\Exception('Invalid traversal direction. Use "top_down" or "bottom_up"');
         }
         $this->_direction = $direction;
     }
