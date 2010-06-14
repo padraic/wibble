@@ -31,6 +31,7 @@ class Fragment extends Document
     {
         $xpath = new \DOMXPath($this->getDOM());
         $result = $xpath->query('/html/body');
+        if ($result->length == 0) return '';
         return $this->_getInnerHTML($result->item(0));
     }
     

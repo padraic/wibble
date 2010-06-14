@@ -29,6 +29,17 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
+     * HTML elements which do not use closing tags (i.e. self-closing)
+     */
+    protected $nonclosingTags = array(
+        'area', 'br', 'col', 'hr', 'img', 'input'
+    );
+    protected $ignoredTags = array(
+        'animateColor', 'animateMotion', 'animateTransform', 'foreignObject',
+        'linearGradient', 'radialGradient', 'title'
+    );
+
+    /**
      * Test Helpers
      */
     
@@ -44,18 +55,35 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         $input       = "<{$tag} title=\"1\">foo <bad>bar</bad> baz</{$tag}>";
         $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
         $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
+        /**
+         * Set exceptions
+         */
+        if (in_array($tag, $this->nonclosingTags)) {
+            $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
+            $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
+        }
+        if (in_array($tag, $this->ignoredTags)) {
+            return;
+        }
         $rexmlOutput = $xhtmlOutput;
         $sane = $this->sanitizeHTML($input);
         $this->assertTrue(($htmlOutput == $sane || $xhtmlOutput == $sane || $rexmlOutput == $sane), $input);
     }
 
     /**
-     * Test allowed tags
+     * Tests
      */
     
-    public function testAllowsATag()
+    public function testAllowsAcceptableElements()
     {
-        $this->checkSanitizationOfNormalTag('a');
+        $acceptableTags = array_merge(
+            Wibble\Scrubber\Whitelist::$acceptableElements,
+            Wibble\Scrubber\Whitelist::$mathmlElements,
+            Wibble\Scrubber\Whitelist::$svgElements
+        );
+        foreach ($acceptableTags as $tag) {
+            $this->checkSanitizationOfNormalTag($tag);
+        }
     }
 
 }
