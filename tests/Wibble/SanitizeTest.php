@@ -67,17 +67,15 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     {
         $input       = "<{$tag} title=\"1\">foo <bad>bar</bad> baz</{$tag}>";
         $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
-        $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
         if (in_array($tag, $this->nonclosingTags)
         || (in_array($tag, array('col')))) {
             $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
-            $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
         } elseif (in_array($tag, $this->ignoredTags)) {
             return;
         }
         $sane = $this->sanitizeHTMLWithoutTidy($input);
         $sane = str_replace("\n", '', $sane);
-        $this->assertTrue(($htmlOutput == $sane || $xhtmlOutput == $sane), $input);
+        $this->assertTrue(($htmlOutput == $sane), $input);
     }
     
     protected function checkSanitizationOfNormalTagWithTidy($tag)
@@ -87,11 +85,9 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         }
         $input       = "<{$tag} title=\"1\">foo <bad>bar</bad> baz</{$tag}>";
         $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
-        $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
         if (in_array($tag, $this->nonclosingTags)
         || (in_array($tag, array('col')) && !class_exists('\\tidy', false))) {
             $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
-            $xhtmlOutput = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz";
         } elseif (in_array($tag, $this->ignoredTags)) {
             return;
         }
@@ -101,59 +97,43 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         if (class_exists('\\tidy', false)) {
             if (in_array($tag, array('caption'))) {
                 $htmlOutput = '<table><'. $tag . ' title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</' . $tag . '></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, array('colgroup'))) {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt; baz<table><'. $tag . ' title="1"></' . $tag . '></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, array('table'))) {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt; baz<table title="1"></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, array('optgroup', 'option', 'tbody', 'tfoot', 'thead'))) {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt; baz';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'td') {
                 $htmlOutput = '<table><tr><td title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</td></tr></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'th') {
                 $htmlOutput = '<table><tr><th title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</th></tr></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'tr') {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt; baz<table><tr title="1"><td></td></tr></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'col') {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt; baz<table><col title="1"></table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'table') {
                 $htmlOutput = 'foo &lt;bad&gt;bar&lt;/bad&gt;baz<table title="1"> </table>';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'image') {
                 $htmlOutput = '<img title="1"/>foo &lt;bad&gt;bar&lt;/bad&gt; baz';
-                $xhtmlOutput = $htmlOutput;
             } elseif ($tag == 'input') {
                 $htmlOutput = '<form><input title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</form>';
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, array('dir', 'menu', 'ol', 'ul'))) {
                 $htmlOutput = '<div style="margin-left: 2em" title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</div>';
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, Wibble\Scrubber\Whitelist::$voidElements)) {
                 $htmlOutput = '<' . $tag . ' title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz';
-                $xhtmlOutput = $htmlOutput;
             } elseif (isset($this->imposedParentTags[$tag])) {
                 $parent = $this->imposedParentTags[$tag];
                 $htmlOutput = "<{$parent}><{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}></{$parent}>";
-                $xhtmlOutput = $htmlOutput;
             } elseif (isset($this->imposedChildTags[$tag])) {
                 $child = $this->imposedChildTags[$tag];
                 $htmlOutput = "<{$tag} title=\"1\"><{$child}>foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$child}></{$tag}>";
-                $xhtmlOutput = $htmlOutput;
             } elseif (in_array($tag, array('select'))) {
                 $htmlOutput = '';
-                $xhtmlOutput = $htmlOutput;
             }
         }
         $sane = $this->sanitizeHTMLWithTidy($input);
         $sane = str_replace("\n", '', $sane);
-        $this->assertTrue(($htmlOutput == $sane || $xhtmlOutput == $sane), $input);
+        $this->assertTrue(($htmlOutput == $sane), $input);
     }
 
     /**
