@@ -28,9 +28,16 @@ class Document
 {
 
     protected $_dom = null;
+    
+    protected $_options = array(
+        'disable_tidy' => false
+    );
 
-    public function __construct($markup)
+    public function __construct($markup, array $options = null)
     {
+        if (!is_null($options)) {
+            $this->_options = (array) $options;
+        }
         $this->_dom = new \DOMDocument;
         $this->_dom->preserveWhitespace = false;
         $this->_dom->formatOutput = true;
@@ -78,4 +85,5 @@ class Document
     {
         return $this->_dom->saveHTML();
     }
+    
 }

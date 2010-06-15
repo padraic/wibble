@@ -32,7 +32,20 @@ class Fragment extends Document
         $xpath = new \DOMXPath($this->getDOM());
         $result = $xpath->query('/html/body');
         if ($result->length == 0) return '';
-        return $this->_getInnerHTML($result->item(0));
+        $output = $this->_getInnerHTML($result->item(0));
+        if (!class_exists('\\tidy', false)
+        || $this->_options['disable_tidy'] === true) {
+            return $output;
+        }
+        $tidy = new \tidy;
+        $config = array(
+            'hide-comments' => true,
+            'show-body-only' => true,
+            'wrap' => 0
+        );
+        $tidy->parseString($output, $config);
+        $tidy->cleanRepair();
+        return trim((string) $tidy);
     }
     
     protected function _getInnerHTML(\DOMNode $node)
