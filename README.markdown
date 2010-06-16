@@ -30,23 +30,23 @@ The primary PHP solution for sanitising HTML is the HTMLPurifier library. HTMLPu
 
 All existing used solutions tend to share one or more of the following user complaints.
 
-1. Reliance on regular expressions for parsing
+### Reliance on regular expressions for parsing
 
 Regular expressions are historically unreliable when it comes to something like parsing/altering HTML since the standards are so loose that parsing must deal with numerous yet valid HTML markup oddities not to mention numerous standards. Also, because the wellformedness of the resulting document is not subject to a comprehensive validation/rendering approach, they often result in malformed or non-standard HTML output leading to unpredictable results when rendered. Sanitizers of this type have a long standing history of containing security exploits or needing consistent updating to reflect new exploits (see Zend_Filter_StripTags).
 
-2. Reliance on comprehensive but slow parsing
+### Reliance on comprehensive but slow parsing
 
 In place of regular expressions, such solutions use a token based parser which is far more comprehensive than regular expressions (by orders of magnitude) but can be slow and cumbersome. Usually, however, the performance hit is worth it in exchange for wellformed sanitized output. Thus the issue in such cases is typically performance, size and the resulting restriction of uses to least-costly times (e.g. on input when results can be cached). Sanitizers of this type tend to be the most secure and broadly compatible options. However, their performance has always discouraged use where avoidable.
 
-3. Lack of maintainance
+### Lack of maintainance
 
 Many (almost all) HTML sanitizers in PHP have fallen into unmaintained states and an unmaintained security library is a dangerous thing. The number of actively maintained sanitizers is extremely small. The source of much of the needed maintenance is derived from the use of complex parsers, regular expressions, blacklists (require constant updating/review), and other general requirements. Without regular maintenance, such sanitization solutions may become insecure over time.
 
-4. Lack of wellformed output
+### Lack of wellformed output
 
 Most simplified sanitizers (primarily those driven by regular expressions) treat HTML as a string rather than as a structured HTML document. The result is often that output from such sanitization processes is no longer well formed (i.e. adherent to a HTML standard). This can have curious side-effects in output depending on the browser. For example, what happens if a sanitized </div> tag (it contains no XSS and has no matching opening tag) gets into the middle of your otherwise valid XHTML 1.0 Strict page (assuming such a tag was allowable)? XSS is not the only reason to sanitize input HTML. The capability to deface or break sites is still a prevelant risk that needs addressing.
 
-5. Incomplete/Misleading/Misdirected
+### Incomplete/Misleading/Misdirected
 
 Sanitizing HTML is one of the more obscure aspects of preventing Cross-Site Scripting (XSS) and as a result there are a wide variety of approaches from the naive (run it through Tidy!) to the incomplete (PHP's strip_tags()) to the profoundly unhappy (dodgy BBCode parsers). It's little wonder programmers get confused. When you decide to parse Markdown from comments instead of HTML and find out that your Markdown parser can generate XSS riddled HTML, you're in this category. It must be noted that sanitizing HTML is a multi-step procedure and omitting any of the necessary steps is a Bad Thing (TM).
 
@@ -59,9 +59,9 @@ Wibble operates using two sets of classes: Wibble\HTML and Wibble\Filter. Wibble
 
 Each new Document/Fragment defines a filter() method accepting one of:
 
-1. Internal named filter
-2. Object of type Wibble\Filter\Filterable
-3. Closure accepting a \DOMNode as a parameter
+* Internal named filter
+* Object of type Wibble\Filter\Filterable
+* Closure accepting a \DOMNode as a parameter
 
 Once called, filter() traverses the entire DOM and calls the provided filter on all nodes encountered. This is a recursive process, so any one filter procedure can terminate itself and pass control back to the parent procedure (handy if a filter should skip processing an entire child tree).
 
