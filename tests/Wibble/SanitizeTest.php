@@ -169,6 +169,44 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         $sane = str_replace("\n", '', $sane);
         $this->assertTrue(($htmlOutput == $sane), $input);
     }
+    
+    protected function checkSanitizationOfAcceptableProtocolsLowerCasedWithTidy($protocol)
+    {
+        $input = "<a href=\"{$protocol}\">foo</a>";
+        $htmlOutput = "<a href=\"{$protocol}\">foo</a>";
+        $sane = $this->sanitizeHTMLWithTidy($input);
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
+    
+    protected function checkSanitizationOfAcceptableProtocolsUpperCasedWithTidy($protocol)
+    {
+        $protocol = strtoupper($protocol);
+        $input = "<a href=\"{$protocol}\">foo</a>";
+        $htmlOutput = "<a href=\"{$protocol}\">foo</a>";
+        $sane = $this->sanitizeHTMLWithTidy($input);
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
+    
+    protected function checkSanitizationOfAcceptableProtocolsLowerCasedWithoutTidy($protocol)
+    {
+        $input = "<a href=\"{$protocol}\">foo</a>";
+        $htmlOutput = "<a href=\"{$protocol}\">foo</a>";
+        $sane = $this->sanitizeHTMLWithoutTidy($input);
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
+    
+    protected function checkSanitizationOfAcceptableProtocolsUpperCasedWithoutTidy($protocol)
+    {
+        $protocol = strtoupper($protocol);
+        $input = "<a href=\"{$protocol}\">foo</a>";
+        $htmlOutput = "<a href=\"{$protocol}\">foo</a>";
+        $sane = $this->sanitizeHTMLWithoutTidy($input);
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
 
     /**
      * Tests
@@ -202,6 +240,22 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         }
         foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
             $this->checkSanitizationOfNormalAttributeWithoutTidy($attr);
+        }
+    }
+    
+    public function testAllowsAcceptableProtocols()
+    {
+        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+            $this->checkSanitizationOfAcceptableProtocolsLowerCasedWithTidy($prot);
+        }
+        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+            $this->checkSanitizationOfAcceptableProtocolsUpperCasedWithTidy($prot);
+        }
+        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+            $this->checkSanitizationOfAcceptableProtocolsLowerCasedWithoutTidy($prot);
+        }
+        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+            $this->checkSanitizationOfAcceptableProtocolsUpperCasedWithoutTidy($prot);
         }
     }
 
