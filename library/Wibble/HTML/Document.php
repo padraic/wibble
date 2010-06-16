@@ -47,10 +47,10 @@ class Document
         libxml_use_internal_errors(false);
     }
     
-    public function scrub($scrubber)
+    public function filter($filterber)
     {
-        $scrubber = $this->_resolve($scrubber);
-        $scrubber->traverse($this->_dom->documentElement);
+        $filterber = $this->_resolve($filterber);
+        $filterber->traverse($this->_dom->documentElement);
         return $this;
     }
     
@@ -59,21 +59,21 @@ class Document
         return $this->_dom;
     }
 
-    protected function _resolve($scrubber)
+    protected function _resolve($filter)
     {
-        if (is_string($scrubber)) {
-            $scrubber = ucfirst(strtolower($scrubber));
+        if (is_string($filter)) {
+            $filter = ucfirst(strtolower($filter));
         }
-        if ($scrubber instanceof Wibble\Scrubber\Scrubbable) {
-            return $scrubber;
-        } elseif (is_string($scrubber)) {
-            if (in_array($scrubber, array('Strip', 'Escape'))) { // delegate out from explicit strings
-                $class = 'Wibble\\Scrubber\\' . $scrubber;
+        if ($filter instanceof Wibble\Filter\Filterable) {
+            return $filter;
+        } elseif (is_string($filter)) {
+            if (in_array($filter, array('Strip', 'Escape'))) { // delegate out from explicit strings
+                $class = 'Wibble\\Filter\\' . $filter;
                 $return = new $class;
                 return $return;
             }   
         }
-        throw new Wibble\Exception('Scrubber does not exist: ' . (string) $scrubber);
+        throw new Wibble\Exception('Filter does not exist: ' . (string) $filter);
     }
     
     public function toString()

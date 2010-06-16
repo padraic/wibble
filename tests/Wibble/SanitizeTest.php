@@ -52,14 +52,14 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     protected function sanitizeHTMLWithTidy($string)
     {
         $fragment = new Wibble\HTML\Fragment($string);
-        $fragment->scrub('escape');
+        $fragment->filter('escape');
         return $fragment->toString();
     }
     
     protected function sanitizeHTMLWithoutTidy($string)
     {
         $fragment = new Wibble\HTML\Fragment($string, array('disable_tidy'=>true));
-        $fragment->scrub('escape');
+        $fragment->filter('escape');
         return $fragment->toString();
     }
     
@@ -119,7 +119,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
                 $htmlOutput = '<form><input title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</form>';
             } elseif (in_array($tag, array('dir', 'menu', 'ol', 'ul'))) {
                 $htmlOutput = '<div style="margin-left: 2em" title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz</div>';
-            } elseif (in_array($tag, Wibble\Scrubber\Whitelist::$voidElements)) {
+            } elseif (in_array($tag, Wibble\Filter\Whitelist::$voidElements)) {
                 $htmlOutput = '<' . $tag . ' title="1">foo &lt;bad&gt;bar&lt;/bad&gt; baz';
             } elseif (isset($this->imposedParentTags[$tag])) {
                 $parent = $this->imposedParentTags[$tag];
@@ -218,11 +218,11 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     public function testAllowsAcceptableElements()
     {
         $acceptableTags = array_merge(
-            Wibble\Scrubber\Whitelist::$acceptableElements
+            Wibble\Filter\Whitelist::$acceptableElements
         );
         $acceptableXmlTags = array_merge(
-            Wibble\Scrubber\Whitelist::$mathmlElements,
-            Wibble\Scrubber\Whitelist::$svgElements
+            Wibble\Filter\Whitelist::$mathmlElements,
+            Wibble\Filter\Whitelist::$svgElements
         );
         foreach ($acceptableTags as $tag) {
             $this->checkSanitizationOfNormalTagWithTidy($tag);
@@ -238,26 +238,26 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     public function testAllowsAcceptableAttributes()
     {
-        foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
+        foreach (Wibble\Filter\Whitelist::$acceptableAttributes as $attr) {
             $this->checkSanitizationOfNormalAttributeWithTidy($attr);
         }
-        foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
+        foreach (Wibble\Filter\Whitelist::$acceptableAttributes as $attr) {
             $this->checkSanitizationOfNormalAttributeWithoutTidy($attr);
         }
     }
     
     public function testAllowsAcceptableProtocols()
     {
-        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+        foreach (Wibble\Filter\Whitelist::$acceptableProtocols as $prot) {
             $this->checkSanitizationOfAcceptableProtocolsLowerCasedWithTidy($prot);
         }
-        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+        foreach (Wibble\Filter\Whitelist::$acceptableProtocols as $prot) {
             $this->checkSanitizationOfAcceptableProtocolsUpperCasedWithTidy($prot);
         }
-        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+        foreach (Wibble\Filter\Whitelist::$acceptableProtocols as $prot) {
             $this->checkSanitizationOfAcceptableProtocolsLowerCasedWithoutTidy($prot);
         }
-        foreach (Wibble\Scrubber\Whitelist::$acceptableProtocols as $prot) {
+        foreach (Wibble\Filter\Whitelist::$acceptableProtocols as $prot) {
             $this->checkSanitizationOfAcceptableProtocolsUpperCasedWithoutTidy($prot);
         }
     }

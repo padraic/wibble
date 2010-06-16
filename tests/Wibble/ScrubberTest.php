@@ -38,18 +38,18 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
         $this->fragmentTopDownStopCount = 2 - 1; // -1 refers again to libxml2's additions to fragments
         $this->documentTopDownStopCount = 1;
         $self =& $this;
-        $this->scrubberGo = new Wibble\Scrubber\Closure(function($node) use ($self) {
+        $this->filterGo = new Wibble\Filter\Closure(function($node) use ($self) {
             $self->count += 1;
-            return \Wibble\Scrubber\AbstractScrubber::GO;
+            return \Wibble\Filter\AbstractFilter::GO;
         });
-        $this->scrubberStop = new Wibble\Scrubber\Closure(function($node) use ($self) {
+        $this->filterStop = new Wibble\Filter\Closure(function($node) use ($self) {
             $self->count += 1;
-            return \Wibble\Scrubber\AbstractScrubber::STOP;
+            return \Wibble\Filter\AbstractFilter::STOP;
         });
-        $this->scrubberNoFlag = new Wibble\Scrubber\Closure(function($node) use ($self) {
+        $this->filterNoFlag = new Wibble\Filter\Closure(function($node) use ($self) {
             $self->count += 1;
         });
-        $this->scrubberBottomUp = new Wibble\Scrubber\Closure(function($node) use ($self) {
+        $this->filterBottomUp = new Wibble\Filter\Closure(function($node) use ($self) {
             $self->count += 1;
         }, 'bottom_up');
     }
@@ -57,63 +57,63 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
     public function testGoOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->scrub($this->scrubberGo);
+        $document->filter($this->filterGo);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testGoOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->scrub($this->scrubberGo);
+        $document->filter($this->filterGo);
         $this->assertEquals($this->documentNodeCount, $this->count);
     }
     
     public function testStopOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->scrub($this->scrubberStop);
+        $document->filter($this->filterStop);
         $this->assertEquals($this->fragmentTopDownStopCount, $this->count);
     }
     
     public function testStopOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->scrub($this->scrubberStop);
+        $document->filter($this->filterStop);
         $this->assertEquals($this->documentTopDownStopCount, $this->count);
     }
     
     public function testNoFlagOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->scrub($this->scrubberNoFlag);
+        $document->filter($this->filterNoFlag);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testBottomUpOperatesProperlyOnFragments()
     {
         $document = new Wibble\HTML\Document($this->fragment);
-        $document->scrub($this->scrubberBottomUp);
+        $document->filter($this->filterBottomUp);
         $this->assertEquals($this->fragmentNodeCount, $this->count);
     }
     
     public function testBottomUpOperatesProperlyOnDocuments()
     {
         $document = new Wibble\HTML\Document($this->document);
-        $document->scrub($this->scrubberBottomUp);
+        $document->filter($this->filterBottomUp);
         $this->assertEquals($this->documentNodeCount, $this->count);
     }
     
     public function testBadTraversalDirectionThrowsException()
     {
         $this->setExpectedException('Wibble\\Exception');
-        $scrubber = new Wibble\Scrubber\Closure(function($node) {}, 'foo');
+        $filter = new Wibble\Filter\Closure(function($node) {}, 'foo');
     }
     
-    public function testBadScrubberOnDocumentThrowsException()
+    public function testBadFilterOnDocumentThrowsException()
     {
         $this->setExpectedException('Wibble\\Exception');
         $document = new Wibble\HTML\Document($this->document);
-        $document->scrub('foo');
+        $document->filter('foo');
     }
 
 }
