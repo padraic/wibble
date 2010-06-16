@@ -150,7 +150,22 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         // "xml:lang" becomes lang for HTML
         if ($attr == 'xml:lang') $htmlOutput = "<p lang=\"foo\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
         $sane = $this->sanitizeHTMLWithTidy($input);
-        //if($attr=='xml:lang'){var_dump($sane);var_dump($htmlOutput);exit;}
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
+    
+    protected function checkSanitizationOfNormalAttributeWithoutTidy($attr)
+    {
+        $input = "<p {$attr}=\"foo\">foo <bad>bar</bad> baz</p>";
+        if (in_array($attr, array('checked', 'compact', 'disabled', 'ismap',
+        'multiple', 'nohref', 'noshade', 'nowrap', 'readonly', 'selected'))) {
+            $htmlOutput = "<p {$attr}>foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        } else {
+            $htmlOutput = "<p {$attr}=\"foo\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        }
+        // "foo" is not valid CSS so should be blank
+        if ($attr == 'style') $htmlOutput = "<p {$attr}=\"\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        $sane = $this->sanitizeHTMLWithoutTidy($input);
         $sane = str_replace("\n", '', $sane);
         $this->assertTrue(($htmlOutput == $sane), $input);
     }
@@ -184,6 +199,9 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     {
         foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
             $this->checkSanitizationOfNormalAttributeWithTidy($attr);
+        }
+        foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
+            $this->checkSanitizationOfNormalAttributeWithoutTidy($attr);
         }
     }
 
