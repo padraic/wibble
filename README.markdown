@@ -84,4 +84,4 @@ Two proposed internal filters will be: Escape and StripTags. The former filters 
 
 If the proposal is accepted, it is expected that several default filters from Wibble can be encapsulated into View Helpers to streamline simple use cases.
 
-As the above outline presents, the component would be relatively simple. There are no token based parsers that need heavy development or maintainance input, the use of C extensions over native parsers should provide some speed, and the DOM/Tidy combo stand in for any unwarranted dependence on regular expressions.<script>alert("XSS");</script>
+As the above outline presents, the component would be relatively simple. There are no token based parsers that need heavy development or maintainance input, the use of C extensions over native parsers should provide some speed, and the DOM/Tidy combo stand in for any unwarranted dependence on regular expressions.
