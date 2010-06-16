@@ -29,7 +29,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * HTML elements which do not use closing tags (i.e. self-closing)
+     * HTML elements exceptions
      */
     protected $nonclosingTags = array(
         'area', 'br', 'hr', 'img', 'input'
@@ -135,6 +135,25 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
         $sane = str_replace("\n", '', $sane);
         $this->assertTrue(($htmlOutput == $sane), $input);
     }
+    
+    protected function checkSanitizationOfNormalAttributeWithTidy($attr)
+    {
+        $input = "<p {$attr}=\"foo\">foo <bad>bar</bad> baz</p>";
+        if (in_array($attr, array('checked', 'compact', 'disabled', 'ismap',
+        'multiple', 'nohref', 'noshade', 'nowrap', 'readonly', 'selected'))) {
+            $htmlOutput = "<p {$attr}>foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        } else {
+            $htmlOutput = "<p {$attr}=\"foo\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        }
+        // "foo" is not valid CSS so should be blank
+        if ($attr == 'style') $htmlOutput = "<p {$attr}=\"\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        // "xml:lang" becomes lang for HTML
+        if ($attr == 'xml:lang') $htmlOutput = "<p lang=\"foo\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>";
+        $sane = $this->sanitizeHTMLWithTidy($input);
+        //if($attr=='xml:lang'){var_dump($sane);var_dump($htmlOutput);exit;}
+        $sane = str_replace("\n", '', $sane);
+        $this->assertTrue(($htmlOutput == $sane), $input);
+    }
 
     /**
      * Tests
@@ -159,6 +178,13 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
             $this->checkSanitizationOfNormalTagWithoutTidy($tag);
         }
         // todo - XML under tidy
+    }
+    
+    public function testAllowsAcceptableAttributes()
+    {
+        foreach (Wibble\Scrubber\Whitelist::$acceptableAttributes as $attr) {
+            $this->checkSanitizationOfNormalAttributeWithTidy($attr);
+        }
     }
 
 }

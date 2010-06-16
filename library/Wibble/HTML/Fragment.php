@@ -33,7 +33,7 @@ class Fragment extends Document
         $result = $xpath->query('/html/body');
         if ($result->length == 0) return '';
         $output = $this->_getInnerHTML($result->item(0));
-        if (!class_exists('\\tidy', false)
+        if (!class_exists('\\tidy', false) // throw Exception TODO
         || $this->_options['disable_tidy'] === true) {
             return $output;
         }

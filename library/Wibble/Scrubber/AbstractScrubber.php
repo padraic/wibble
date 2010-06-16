@@ -121,11 +121,12 @@ abstract class AbstractScrubber implements Scrubbable
             if (in_array($name, Whitelist::$attributesWithUriValue)) {
                 $unescaped = htmlspecialchars_decode($attribute->value);
                 $unescaped = strtolower(
-                    preg_replace("/[`\000-\040\177-\240\s]+/", '', $unescaped)
+                    preg_replace('/[`\000-\040\177-\240\s]+/', '', $unescaped)
                 );
-                $protocol = array_pop(explode(':', $unescaped));
-                if (preg_match("", $unescaped)
-                && !in_array($protocol, Whitelist::$allowedProtocols)) {
+                $parts = explode(':', $unescaped);
+                $protocol = $parts[0];
+                if (preg_match('/^[a-z0-9][-+.a-z0-9]*:/', $unescaped)
+                && !in_array($protocol, Whitelist::$acceptableProtocols)) {
                     $node->removeAttributeNode($attribute);
                     return;
                 }
@@ -133,13 +134,13 @@ abstract class AbstractScrubber implements Scrubbable
             if (in_array($name, Whitelist::$svgAttributeValueAllowsRef)) {
                 $node->setAttribute($name,
                     preg_replace(
-                        "/url\s*\(\s*[^#\s][^)]+?\)/m", ' ', $node->getAttribute($name)
+                        '/url\s*\(\s*[^#\s][^)]+?\)/m', ' ', $node->getAttribute($name)
                     )
                 );
             }
             if (in_array($node->tagName, Whitelist::$svgAllowLocalHref)
             && $name == 'xlink:href'
-            && preg_match("/^\s*[^#\s].*/m", $node->getAttribute($name))) {
+            && preg_match('/^\s*[^#\s].*/m', $node->getAttribute($name))) {
                 $node->removeAttributeNode($attribute);
                 return;
             }
@@ -151,25 +152,25 @@ abstract class AbstractScrubber implements Scrubbable
     
     protected function _sanitizeCSS($css)
     {
-        $css = preg_replace("/url\s*\(\s*[^\s)]+?\s*\)\s*/", ' ', $css);
-        if (!preg_match("/^([:,;#%.\sa-zA-Z0-9!]|\w-\w|\'[\s\w]+\'|\"[\s\w]+\"|\([\d,\s]+\))*$/", $css)) {
+        $css = preg_replace('/url\s*\(\s*[^\s)]+?\s*\)\s*/', ' ', $css);
+        if (!preg_match('/^([:,;#%.\sa-zA-Z0-9!]|\w-\w|\'[\s\w]+\'|"[\s\w]+"|\([\d,\s]+\))*$/', $css)) {
             return '';
         }
-        if (!preg_match("/^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$/", $css)) {
+        if (!preg_match('/^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$/', $css)) {
             return '';
         }
         $clean = array();
-        preg_match("/([-\w]+)\s*:\s*([^:;]*)/", $css, $matches, PREG_SET_ORDER);
+        preg_match_all('/([-\w]+)\s*:\s*([^:;]*)/', $css, $matches, PREG_SET_ORDER);
         foreach ($matches as $pairing) {
             if (empty($pairing[2])) continue;
             $prop = explode('-', $pairing[1]);
-            if (in_array($pairing[1], Whitelist::$allowedCssProperties)) {
+            if (in_array($pairing[1], Whitelist::$acceptableCssProperties)) {
                 $clean[] = $pairing[1] . ': ' . $pairing[2] . ';';
             } elseif (in_array($prop[0], array('background','border','margin','padding'))) {
                 $split = explode(' ', $pairing[2]);
                 foreach ($split as $term) {
-                    if (!in_array($term, Whitelist::$allowedCssKeywords)
-                    && !preg_match("/^(#[0-9a-f]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|\d{0,2}\.?\d{0,2}(cm|em|ex|in|mm|pc|pt|px|%|,|\))?)$/", $term)) {
+                    if (!in_array($term, Whitelist::$acceptableCssKeywords)
+                    && !preg_match('/^(#[0-9a-f]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|\d{0,2}\.?\d{0,2}(cm|em|ex|in|mm|pc|pt|px|%|,|\))?)$/', $term)) {
                         continue 2;
                     }
                 }
