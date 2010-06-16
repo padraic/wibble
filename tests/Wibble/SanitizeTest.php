@@ -34,7 +34,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     protected $nonclosingTags = array(
         'area', 'br', 'hr', 'img', 'input'
     );
-    protected $ignoredTags = array(
+    protected $ignoredTags = array( // again, leaving the SVG stuff until another time
         'animateColor', 'animateMotion', 'animateTransform', 'foreignObject',
         'linearGradient', 'radialGradient', 'title'
     );
@@ -258,5 +258,9 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
             $this->checkSanitizationOfAcceptableProtocolsUpperCasedWithoutTidy($prot);
         }
     }
+    
+    /**
+     * TODO: SVG stuff later
+     */
 
 }
