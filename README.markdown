@@ -44,7 +44,7 @@ Many (almost all) HTML sanitizers in PHP have fallen into unmaintained states an
 
 ### Lack of wellformed output
 
-Most simplified sanitizers (primarily those driven by regular expressions) treat HTML as a string rather than as a structured HTML document. The result is often that output from such sanitization processes is no longer well formed (i.e. adherent to a HTML standard). This can have curious side-effects in output depending on the browser. For example, what happens if a sanitized </div> tag (it contains no XSS and has no matching opening tag) gets into the middle of your otherwise valid XHTML 1.0 Strict page (assuming such a tag was allowable)? XSS is not the only reason to sanitize input HTML. The capability to deface or break sites is still a prevelant risk that needs addressing.
+Most simplified sanitizers (primarily those driven by regular expressions) treat HTML as a string rather than as a structured HTML document. The result is often that output from such sanitization processes is no longer well formed (i.e. adherent to a HTML standard). This can have curious side-effects in output depending on the browser. For example, what happens if a sanitized div tag (it contains no XSS and has no matching opening tag) gets into the middle of your otherwise valid XHTML 1.0 Strict page (assuming such a tag was allowable)? XSS is not the only reason to sanitize input HTML. The capability to deface or break sites is still a prevelant risk that needs addressing.
 
 ### Incomplete/Misleading/Misdirected
 
