@@ -210,6 +210,9 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests
+     *
+     * Tests are aggregated simply because if one fails, it's easy to spot. Also
+     * I am not writing 500+ tests individually ;)
      */
     
     public function testAllowsAcceptableElements()
