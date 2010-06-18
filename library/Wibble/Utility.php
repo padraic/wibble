@@ -31,6 +31,9 @@ class Utility
         if ($node->nodeType == XML_CDATA_SECTION_NODE) {
             return '<![CDATA[' . $node->nodeValue . ']]&gt;';
         }
+        if ($node->nodeType == XML_TEXT_NODE) {
+            return $node->nodeValue;
+        }
         if (preg_match("/^\#/", $node->nodeName)) {
             return '';
         }

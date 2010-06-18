@@ -29,5 +29,7 @@ interface Filterable
     public function filter(\DOMNode $node);
     
     public function traverse(\DOMNode $node);
+    
+    public function getRenderOptions();
 
 }

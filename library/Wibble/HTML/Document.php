@@ -35,6 +35,7 @@ class Document
 
     public function __construct($markup, array $options = null)
     {
+        if (empty($markup)) $markup = ' ';
         if (!is_null($options)) {
             $this->_options = (array) $options;
         }
@@ -47,10 +48,12 @@ class Document
         libxml_use_internal_errors(false);
     }
     
-    public function filter($filterber)
+    public function filter($filter)
     {
-        $filterber = $this->_resolve($filterber);
-        $filterber->traverse($this->_dom->documentElement);
+        $filter = $this->_resolve($filter);
+        if (!is_null($this->_dom->documentElement)) {
+            $filter->traverse($this->_dom->documentElement);
+        }
         return $this;
     }
     
@@ -67,7 +70,7 @@ class Document
         if ($filter instanceof Wibble\Filter\Filterable) {
             return $filter;
         } elseif (is_string($filter)) {
-            if (in_array($filter, array('Strip', 'Escape'))) { // delegate out from explicit strings
+            if (in_array($filter, array('Strip', 'Escape', 'Prune'))) { // delegate out from explicit strings
                 $class = 'Wibble\\Filter\\' . $filter;
                 $return = new $class;
                 return $return;

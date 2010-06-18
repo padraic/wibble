@@ -52,6 +52,10 @@ abstract class AbstractFilter implements Filterable
         $this->_direction = $direction;
     }
     
+    public function getRenderOptions()
+    {
+    }
+    
     protected function _traverseTopDown(\DOMNode $node)
     {
         if ($this->filter($node) == self::STOP) {

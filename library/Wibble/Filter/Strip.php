@@ -32,8 +32,9 @@ class Strip extends AbstractFilter
         if ($this->_sanitize($node) == AbstractFilter::GO) {
             return AbstractFilter::GO;
         }
-        foreach ($node->childNodes as $child) {
-            $node->parentNode->insertBefore($child, $node);
+        $children = $node->childNodes;
+        for ($i=0;$i<=$children->length;$i++) {
+            $node->parentNode->insertBefore($children->item($i), $node);
         }
         $node->parentNode->removeChild($node);
     }
