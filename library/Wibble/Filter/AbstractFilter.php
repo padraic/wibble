@@ -104,7 +104,8 @@ abstract class AbstractFilter implements Filterable
     
     protected function _sanitize(\DOMNode $node)
     {
-        if ($this->getUserWhitelist() === null) {
+        $userWhitelist = $this->getUserWhitelist();
+        if ($userWhitelist === null) {
             $tagsAllowed = array_merge(
                 Whitelist::$acceptableElements,
                 Whitelist::$mathmlElements,
@@ -112,12 +113,16 @@ abstract class AbstractFilter implements Filterable
                 Whitelist::$tagsSafeWithLibxml2
             );
         } else {
-            $tagsAllowed = array_keys($this->getUserWhitelist());
+            $tagsAllowed = array_keys($userWhitelist);
         }
         switch ($node->nodeType) {
             case XML_ELEMENT_NODE:
                 if (in_array($node->tagName, $tagsAllowed)) {
-                    $this->_sanitizeAttributes($node);
+                    if ($userWhitelist === null) {
+                        $this->_sanitizeAttributes($node);
+                    } else {
+                        $this->_sanitizeAttributes($node, $userWhitelist[$node->tagName]);
+                    }
                     return self::GO;
                 }
                 break;
@@ -129,13 +134,17 @@ abstract class AbstractFilter implements Filterable
         return self::STOP;
     }
     
-    protected function _sanitizeAttributes(\DOMNode $node)
+    protected function _sanitizeAttributes(\DOMNode $node, array $userWhitelist = null)
     {
-        $allowedAttributes = array_merge(
-            Whitelist::$acceptableAttributes,
-            Whitelist::$mathmlAttributes,
-            Whitelist::$svgAttributes
-        );
+        if ($userWhitelist === null) {
+            $allowedAttributes = array_merge(
+                Whitelist::$acceptableAttributes,
+                Whitelist::$mathmlAttributes,
+                Whitelist::$svgAttributes
+            );
+        } else {
+            $allowedAttributes = $userWhitelist;
+        }
         foreach ($node->attributes as $attribute) {
             if (!empty($attribute->prefix)) {
                 $name = $attribute->prefix . ':' . $attribute->name;

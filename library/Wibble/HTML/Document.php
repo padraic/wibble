@@ -50,6 +50,14 @@ class Document
     
     public function filter($filter, array $whitelist = null)
     {
+        if (is_array($filter) || empty($filter)) {
+            if (empty($filter)) {
+                $filter = 'strip';
+            } elseif (is_array($filter)) {
+                $whitelist = $filter;
+                $filter = 'strip';
+            }
+        }
         $filter = $this->_resolve($filter);
         if (!is_null($whitelist)) {
             $filter->setUserWhitelist($whitelist);
