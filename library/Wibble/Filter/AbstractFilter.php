@@ -33,6 +33,8 @@ abstract class AbstractFilter implements Filterable
     
     protected $_direction = 'top_down';
     
+    protected $_userWhitelist = null;
+    
     public function __construct($direction = null)
     {
         if (!is_null($direction)) {
@@ -54,6 +56,24 @@ abstract class AbstractFilter implements Filterable
     
     public function getRenderOptions()
     {
+    }
+    
+    public function setUserWhitelist($whitelist)
+    {
+        // We need to allow base tags or DOM cannot render!!
+        // These are stripped if exporting from Wibble\HTML\Fragment
+        if (!array_key_exists('html', $whitelist)) {
+            $whitelist['html'] = array();
+        }
+        if (!array_key_exists('body',$whitelist)) {
+            $whitelist['body'] = array();
+        }
+        $this->_userWhitelist = $whitelist;
+    }
+    
+    public function getUserWhitelist()
+    {
+        return $this->_userWhitelist;
     }
     
     protected function _traverseTopDown(\DOMNode $node)
@@ -84,12 +104,16 @@ abstract class AbstractFilter implements Filterable
     
     protected function _sanitize(\DOMNode $node)
     {
-        $tagsAllowed = array_merge(
-            Whitelist::$acceptableElements,
-            Whitelist::$mathmlElements,
-            Whitelist::$svgElements,
-            Whitelist::$tagsSafeWithLibxml2
-        );
+        if ($this->getUserWhitelist() === null) {
+            $tagsAllowed = array_merge(
+                Whitelist::$acceptableElements,
+                Whitelist::$mathmlElements,
+                Whitelist::$svgElements,
+                Whitelist::$tagsSafeWithLibxml2
+            );
+        } else {
+            $tagsAllowed = array_keys($this->getUserWhitelist());
+        }
         switch ($node->nodeType) {
             case XML_ELEMENT_NODE:
                 if (in_array($node->tagName, $tagsAllowed)) {

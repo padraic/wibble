@@ -26,15 +26,35 @@ use Wibble;
 
 class Strip extends AbstractFilter
 {
+
+    protected $_userWhitelist = array(
+        'html' => array(),
+        'body' => array()
+    );
     
     public function filter(\DOMNode $node)
     {
         if ($this->_sanitize($node) == AbstractFilter::GO) {
+            $children = $node->childNodes;
+            if (is_null($children) || $children->length == 0) {
+                return AbstractFilter::GO;
+            }
+            for ($i=0;$i<$children->length;$i++) {
+                $child = $children->item($i);
+                if ($child->nodeType == XML_ELEMENT_NODE) {
+                    $this->filter($child);
+                }
+            }
             return AbstractFilter::GO;
         }
         $children = $node->childNodes;
-        for ($i=0;$i<=$children->length;$i++) {
-            $node->parentNode->insertBefore($children->item($i), $node);
+        for ($i=0;$i<$children->length;$i++) {
+            $insert = $children->item($i)->cloneNode(true);
+            $node->parentNode->insertBefore(
+                $insert,
+                $node
+            );
+            $this->filter($insert);
         }
         $node->parentNode->removeChild($node);
     }
