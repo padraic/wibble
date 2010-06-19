@@ -57,7 +57,7 @@ class Document
         libxml_use_internal_errors(false);
     }
     
-    public function filter($filter, array $whitelist = null)
+    public function filter($filter = null, array $whitelist = null)
     {
         if (is_array($filter) || empty($filter)) {
             if (empty($filter)) {

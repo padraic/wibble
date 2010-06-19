@@ -48,13 +48,15 @@ class Strip extends AbstractFilter
             return AbstractFilter::GO;
         }
         $children = $node->childNodes;
-        for ($i=0;$i<$children->length;$i++) {
-            $insert = $children->item($i)->cloneNode(true);
-            $node->parentNode->insertBefore(
-                $insert,
-                $node
-            );
-            $this->filter($insert);
+        if (!is_null($children) && $children->length > 0) {
+            for ($i=0;$i<$children->length;$i++) {
+                $insert = $children->item($i)->cloneNode(true);
+                $node->parentNode->insertBefore(
+                    $insert,
+                    $node
+                );
+                $this->filter($insert);
+            }
         }
         $node->parentNode->removeChild($node);
     }
