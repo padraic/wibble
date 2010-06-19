@@ -27,17 +27,26 @@ use Wibble;
 class Document
 {
 
+    const XHTML11             = 'XHTML11';
+    const XHTML1_STRICT       = 'XHTML1_STRICT';
+    const XHTML1_TRANSITIONAL = 'XHTML1_TRANSITIONAL';
+    const HTML4_STRICT        = 'HTML4_STRICT';
+    const HTML4_TRANSITIONAL  = 'HTML4_TRANSITIONAL';
+
     protected $_dom = null;
     
     protected $_options = array(
-        'disable_tidy' => false
+        'disable_tidy' => false,
+        'doctype' => self::HTML4_TRANSITIONAL,
+        'input_encoding' => 'utf-8',
+        'output_encoding' => 'utf-8',
     );
 
     public function __construct($markup, array $options = null)
     {
         if (empty($markup)) $markup = ' ';
         if (!is_null($options)) {
-            $this->_options = (array) $options;
+            $this->_options = array_merge($this->_options, (array) $options);
         }
         $this->_dom = new \DOMDocument;
         $this->_dom->preserveWhitespace = false;
@@ -97,7 +106,31 @@ class Document
     
     public function __toString()
     {
-        return $this->_dom->saveHTML();
+        $output = $this->_dom->saveHTML();
+        if (!class_exists('\\tidy', false) // throw Exception TODO
+        || $this->_options['disable_tidy'] === true) {
+            return $output;
+        }
+        $tidy = new \tidy;
+        $config = array(
+            'hide-comments' => true,
+            'input-encoding' => str_replace('-', '', $this->_options['input_encoding']),
+            'output-encoding' => str_replace('-', '', $this->_options['output_encoding']),
+            'wrap' => 0,
+        );
+        if (preg_match("/XHTML/", $this->_options['doctype'])) {
+            $config['output-xhtml'] = true;
+        } else {
+            $config['output-html'] = true;
+        }
+        if (preg_match("/TRANSITIONAL/", $this->_options['doctype'])) {
+            $config['doctype'] = 'transitional';
+        } else {
+            $config['doctype'] = 'strict';
+        }
+        $tidy->parseString($output, $config);
+        $tidy->cleanRepair();
+        return trim((string) $tidy);
     }
     
 }

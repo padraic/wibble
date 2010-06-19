@@ -70,5 +70,29 @@ class DocTest extends \PHPUnit_Framework_TestCase
         $doc = new Wibble\HTML\Document($this->fragment);
         $this->assertEquals($this->fragment, $this->getInnerHTMLFrom($doc->getDOM(), '/html/body'));
     }
+    
+    public function testBasicHTMLOutput()
+    {
+        $options = array(
+            'doctype' => Wibble\HTML\Document::HTML4_TRANSITIONAL
+        );
+        $doc = new Wibble\HTML\Document(
+            '<br>foo',
+            $options
+        );
+        $this->assertRegExp('/<br>foo/', str_replace("\n",'',$doc->toString()));
+    }
+    
+    public function testBasicXHTMLOutput()
+    {
+        $options = array(
+            'doctype' => Wibble\HTML\Document::XHTML1_STRICT
+        );
+        $doc = new Wibble\HTML\Document(
+            '<br>foo',
+            $options
+        );
+        $this->assertRegExp('/<br \/>foo/', str_replace("\n",'',$doc->toString()));
+    }
 
 }

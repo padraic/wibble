@@ -41,8 +41,20 @@ class Fragment extends Document
         $config = array(
             'hide-comments' => true,
             'show-body-only' => true,
-            'wrap' => 0
+            'input-encoding' => str_replace('-', '', $this->_options['input_encoding']),
+            'output-encoding' => str_replace('-', '', $this->_options['output_encoding']),
+            'wrap' => 0,
         );
+        if (preg_match("/XHTML/", $this->_options['doctype'])) {
+            $config['output-xhtml'] = true;
+        } else {
+            $config['output-html'] = true;
+        }
+        if (preg_match("/TRANSITIONAL/", $this->_options['doctype'])) {
+            $config['doctype'] = 'transitional';
+        } else {
+            $config['doctype'] = 'strict';
+        }
         $tidy->parseString($output, $config);
         $tidy->cleanRepair();
         return trim((string) $tidy);
