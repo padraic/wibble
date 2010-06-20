@@ -158,7 +158,7 @@ class XSSTest extends \PHPUnit_Framework_TestCase
                 case 'acaa6f745918544d200d6ab1d3d49dcc':
                     $this->assertEquals('PT SRC="http://ha.ckers.org/xss.js"&gt;', $result); continue;
                     break;
-                case '5dd8311a5bb5113e8ac2da6d5c78faf7': // watch this - open tag though URI filtered
+                case '5dd8311a5bb5113e8ac2da6d5c78faf7': // watch this - open tag though URI and assoc tags filtered
                     $this->assertEquals('<?import namespace="t" implementation="#default#time2">', $result); continue;
                     break;
                 default:
