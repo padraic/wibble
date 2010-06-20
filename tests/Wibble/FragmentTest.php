@@ -65,14 +65,22 @@ class FragmentTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests
      */
-    public function testBasicFragment()
+    public function testBasicFragmentWithTidy()
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $doc = new Wibble\HTML\Fragment($this->fragment);
         $this->assertEquals($this->fragment, str_replace("\n",'',$doc->toString()));
     }
     
-    public function testBasicHTMLOutput()
+    public function testBasicFragmentWithoutTidy()
     {
+        $doc = new Wibble\HTML\Fragment($this->fragment, array('disable_tidy'=>true));
+        $this->assertEquals($this->fragment, str_replace("\n",'',$doc->toString()));
+    }
+    
+    public function testBasicHTMLOutputWithTidy()
+    {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $options = array(
             'doctype' => Wibble\HTML\Document::HTML4_TRANSITIONAL
         );
@@ -83,8 +91,9 @@ class FragmentTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/<br>foo/', str_replace("\n",'',$doc->toString()));
     }
     
-    public function testBasicXHTMLOutput()
+    public function testBasicXHTMLOutputWithTidy()
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $options = array(
             'doctype' => Wibble\HTML\Document::XHTML1_STRICT
         );
@@ -93,6 +102,32 @@ class FragmentTest extends \PHPUnit_Framework_TestCase
             $options
         );
         $this->assertRegExp('/<br \/>foo/', str_replace("\n",'',$doc->toString()));
+    }
+    
+    public function testBasicHTMLOutputWithoutTidy()
+    {
+        $options = array(
+            'doctype' => Wibble\HTML\Document::HTML4_TRANSITIONAL,
+            'disable_tidy' => true
+        );
+        $doc = new Wibble\HTML\Fragment(
+            '<br>foo',
+            $options
+        );
+        $this->assertRegExp('/<br>foo/', str_replace("\n",'',$doc->toString()));
+    }
+    
+    public function testBasicXHTMLOutputWithoutTidy()
+    {
+        $options = array(
+            'doctype' => Wibble\HTML\Document::XHTML1_STRICT,
+            'disable_tidy' => true
+        );
+        $doc = new Wibble\HTML\Fragment(
+            '<br>foo',
+            $options
+        );
+        $this->assertRegExp('/<br>foo/', str_replace("\n",'',$doc->toString()));
     }
     
     public function testDocumentOutputThrowsExceptionIfTidyNotAvailableAndNotDisabledExplicitly()

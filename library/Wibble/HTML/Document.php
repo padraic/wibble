@@ -48,13 +48,7 @@ class Document
         if (!is_null($options)) {
             $this->_options = array_merge($this->_options, (array) $options);
         }
-        $this->_dom = new \DOMDocument;
-        $this->_dom->preserveWhitespace = false;
-        $this->_dom->formatOutput = true;
-        $this->_dom->recover = 1;
-        libxml_use_internal_errors(true);
-        $this->_dom->loadHTML($markup);
-        libxml_use_internal_errors(false);
+        $this->_load($markup);
     }
     
     public function filter($filter = null, array $whitelist = null)
@@ -99,16 +93,23 @@ class Document
         throw new Wibble\Exception('Filter does not exist: ' . (string) $filter);
     }
     
-    public function toString()
-    {
-        return (string) $this;
-    }
-    
     public function __toString()
     {
+        return $this->toString();
+    }
+    
+    public function toString()
+    {
         $output = $this->_dom->saveHTML();
-        if (!class_exists('\\tidy', false) // throw Exception TODO
-        || $this->_options['disable_tidy'] === true) {
+        if (!class_exists('\\tidy') && !$this->_options['disable_tidy']) {
+            throw new Wibble\Exception(
+                'It is highly recommended that Wibble operate with support from'
+                . ' the PHP Tidy extension to ensure output wellformedness. If'
+                . ' you are unable to install this extension you may explicitly'
+                . ' disable Tidy support by setting the disable_tidy configuration'
+                . ' option to FALSE'
+            );
+        } elseif ($this->_options['disable_tidy']) {
             return $output;
         }
         $tidy = new \tidy;
@@ -131,6 +132,17 @@ class Document
         $tidy->parseString($output, $config);
         $tidy->cleanRepair();
         return trim((string) $tidy);
+    }
+    
+    protected function _load($markup) {
+        $dom = new \DOMDocument;
+        $dom->preserveWhitespace = false;
+        $dom->formatOutput = true;
+        $dom->recover = 1;
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($markup);
+        libxml_use_internal_errors(false);
+        $this->_dom = $dom;
     }
     
 }

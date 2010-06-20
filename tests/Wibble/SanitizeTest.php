@@ -51,6 +51,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     protected function sanitizeHTMLWithTidy($string)
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $fragment = new Wibble\HTML\Fragment($string);
         $fragment->filter('escape');
         return $fragment->toString();
@@ -80,9 +81,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     protected function checkSanitizationOfNormalTagWithTidy($tag)
     {
-        if (!class_exists('tidy', false)) {
-            $this->markTestSkipped('Tidy extension not installed');
-        }
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $input       = "<{$tag} title=\"1\">foo <bad>bar</bad> baz</{$tag}>";
         $htmlOutput  = "<{$tag} title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</{$tag}>";
         if (in_array($tag, $this->nonclosingTags)
@@ -138,6 +137,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     protected function checkSanitizationOfNormalAttributeWithTidy($attr)
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $input = "<p {$attr}=\"foo\">foo <bad>bar</bad> baz</p>";
         if (in_array($attr, array('checked', 'compact', 'disabled', 'ismap',
         'multiple', 'nohref', 'noshade', 'nowrap', 'readonly', 'selected'))) {
@@ -172,6 +172,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     protected function checkSanitizationOfAcceptableProtocolsLowerCasedWithTidy($protocol)
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $input = "<a href=\"{$protocol}\">foo</a>";
         $htmlOutput = "<a href=\"{$protocol}\">foo</a>";
         $sane = $this->sanitizeHTMLWithTidy($input);
@@ -181,6 +182,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     
     protected function checkSanitizationOfAcceptableProtocolsUpperCasedWithTidy($protocol)
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $protocol = strtoupper($protocol);
         $input = "<a href=\"{$protocol}\">foo</a>";
         $htmlOutput = "<a href=\"{$protocol}\">foo</a>";

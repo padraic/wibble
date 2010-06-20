@@ -36,23 +36,47 @@ class FiltersTest extends \PHPUnit_Framework_TestCase
         $this->culled = "foo<p>bar</p>bazz<div>quux</div>";
     }
     
-    public function testEscaping()
+    public function testEscapingWithTidy()
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $doc = new Wibble\HTML\Fragment($this->fragment);
         $doc->filter('escape');
         $this->assertEquals($this->escaped, str_replace("\n", '', $doc->toString()));
     }
     
-    public function testPruning()
+    public function testPruningWithTidy()
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $doc = new Wibble\HTML\Fragment($this->fragment);
         $doc->filter('prune');
         $this->assertEquals($this->pruned, str_replace("\n", '', $doc->toString()));
     }
 
-    public function testCulling()
+    public function testCullingWithTidy()
     {
+        if (!class_exists('\tidy', false)) $this->markTestSkipped('Tidy unavailable');
         $doc = new Wibble\HTML\Fragment($this->fragment);
+        $doc->filter('cull');
+        $this->assertEquals($this->culled, str_replace("\n", '', $doc->toString()));
+    }
+    
+    public function testEscapingWithoutTidy()
+    {
+        $doc = new Wibble\HTML\Fragment($this->fragment, array('disable_tidy'=>true));
+        $doc->filter('escape');
+        $this->assertEquals($this->escaped, str_replace("\n", '', $doc->toString()));
+    }
+    
+    public function testPruningWithoutTidy()
+    {
+        $doc = new Wibble\HTML\Fragment($this->fragment, array('disable_tidy'=>true));
+        $doc->filter('prune');
+        $this->assertEquals($this->pruned, str_replace("\n", '', $doc->toString()));
+    }
+
+    public function testCullingWithoutTidy()
+    {
+        $doc = new Wibble\HTML\Fragment($this->fragment, array('disable_tidy'=>true));
         $doc->filter('cull');
         $this->assertEquals($this->culled, str_replace("\n", '', $doc->toString()));
     }

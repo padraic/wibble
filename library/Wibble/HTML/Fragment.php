@@ -27,14 +27,21 @@ use Wibble;
 class Fragment extends Document
 {
 
-    public function __toString()
+    public function toString()
     {
         $xpath = new \DOMXPath($this->getDOM());
         $result = $xpath->query('/html/body');
         if ($result->length == 0) return '';
         $output = $this->_getInnerHTML($result->item(0));
-        if (!class_exists('\\tidy', false) // throw Exception TODO
-        || $this->_options['disable_tidy'] === true) {
+        if (!class_exists('\\tidy') && !$this->_options['disable_tidy']) {
+            throw new Wibble\Exception(
+                'It is highly recommended that Wibble operate with support from'
+                . ' the PHP Tidy extension to ensure output wellformedness. If'
+                . ' you are unable to install this extension you may explicitly'
+                . ' disable Tidy support by setting the disable_tidy configuration'
+                . ' option to FALSE'
+            );
+        } elseif ($this->_options['disable_tidy']) {
             return $output;
         }
         $tidy = new \tidy;
