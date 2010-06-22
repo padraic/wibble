@@ -23,9 +23,20 @@
  */
 namespace Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Utility
 {
 
+    /**
+     * Serialise a node to an XHTML string
+     *
+     * @param \DOMNode
+     * @return string
+     */
     public static function nodeToString(\DOMNode $node)
     {
         if ($node->nodeType == XML_CDATA_SECTION_NODE) {

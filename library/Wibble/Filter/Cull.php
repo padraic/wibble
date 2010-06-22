@@ -24,9 +24,21 @@
 namespace Wibble\Filter;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Cull extends Strip
 {
     
+    /**
+     * Ensuring the internal whitelist is NULL just means Cull is identical
+     * to Strip except instead of defaulting to stripping all tags, it only
+     * strips tags not in the default whitelist.
+     *
+     * @var null|array
+     */
     protected $_userWhitelist = null;
 
 }

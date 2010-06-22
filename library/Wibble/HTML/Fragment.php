@@ -24,9 +24,19 @@
 namespace Wibble\HTML;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Fragment extends Document
 {
 
+    /**
+     * Convert this Wibble\HTML\Document to serialised HTML/XHTML string
+     *
+     * @return string
+     */
     public function toString()
     {
         $xpath = new \DOMXPath($this->getDOM());
@@ -67,6 +77,12 @@ class Fragment extends Document
         return trim((string) $tidy);
     }
     
+    /**
+     * Based on the given \DOMNode, extract its representative HTML/XHTML
+     * serialisation.
+     *
+     * @return string
+     */
     protected function _getInnerHTML(\DOMNode $node)
     {
         $dom = new \DOMDocument;

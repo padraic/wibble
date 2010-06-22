@@ -22,6 +22,11 @@
  */
 namespace Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Loader
 {
     private $_fileExtension = '.php';

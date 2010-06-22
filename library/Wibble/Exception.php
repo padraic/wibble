@@ -17,9 +17,17 @@
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
  */
- 
+
+/**
+ * @namespace
+ */
 namespace Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Exception extends \UnexpectedValueException
 {
 

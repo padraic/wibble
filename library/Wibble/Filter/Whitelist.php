@@ -25,47 +25,18 @@ namespace Wibble\Filter;
 use Wibble;
 
 /**
- *  HTML whitelist borrowed from HTML5Lib:
- *
- *    http://code.google.com/p/html5lib/
- *
- *   Copyright (c) 2006-2008 The Authors
- *
- *   Contributors:
- *   James Graham - jg307@cam.ac.uk
- *   Anne van Kesteren - annevankesteren@gmail.com
- *   Lachlan Hunt - lachlan.hunt@lachy.id.au
- *   Matt McDonald - kanashii@kanashii.ca
- *   Sam Ruby - rubys@intertwingly.net
- *   Ian Hickson (Google) - ian@hixie.ch
- *   Thomas Broyer - t.broyer@ltgt.net
- *   Jacques Distler - distler@golem.ph.utexas.edu
- *   Henri Sivonen - hsivonen@iki.fi
- *   The Mozilla Foundation (contributions from Henri Sivonen since 2008)
- *
- *   Permission is hereby granted, free of charge, to any person
- *   obtaining a copy of this software and associated documentation
- *   files (the "Software"), to deal in the Software without
- *   restriction, including without limitation the rights to use, copy,
- *   modify, merge, publish, distribute, sublicense, and/or sell copies
- *   of the Software, and to permit persons to whom the Software is
- *   furnished to do so, subject to the following conditions:
- *
- *   The above copyright notice and this permission notice shall be
- *   included in all copies or substantial portions of the Software.
- *
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- *   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- *   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- *   DEALINGS IN THE SOFTWARE.
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
  */
 class Whitelist
 {
 
+    /**
+     * Array of elements generally allowed in HTML
+     *
+     * @var array
+     */
     public static $acceptableElements = array(
         'a', 'abbr', 'acronym', 'address', 'area', 'b', 'big', 'blockquote',
         'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup',
@@ -77,6 +48,11 @@ class Whitelist
         'tfoot', 'th', 'thead', 'tr', 'tt', 'u', 'ul', 'var'
     );
 
+    /**
+     * Array of elements generally allowed in MathML
+     *
+     * @var array
+     */
     public static $mathmlElements = array(
         'annotation', 'annotation-xml', 'maction', 'math', 'merror', 'mfrac',
         'mfenced', 'mi', 'mmultiscripts', 'mn', 'mo', 'mover', 'mpadded',
@@ -85,6 +61,11 @@ class Whitelist
         'munderover', 'none', 'semantics'
     );
     
+    /**
+     * Array of elements generally allowed in SVG
+     *
+     * @var array
+     */
     public static $svgElements = array(
         'a', 'animate', 'animateColor', 'animateMotion', 'animateTransform',
         'circle', 'defs', 'desc', 'ellipse', 'font-face', 'font-face-name',
@@ -94,6 +75,11 @@ class Whitelist
         'switch', 'text', 'title', 'tspan', 'use'
     );
     
+    /**
+     * Array of attributes generally allowed in HTML
+     *
+     * @var array
+     */
     public static $acceptableAttributes = array(
         'abbr', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt',
         'axis', 'border', 'cellpadding', 'cellspacing', 'char', 'charoff',
@@ -107,6 +93,11 @@ class Whitelist
         'title', 'type', 'usemap', 'valign', 'value', 'vspace', 'width', 'xml:lang'
     );
     
+    /**
+     * Array of attributes generally allowed in MathML
+     *
+     * @var array
+     */
     public static $mathmlAttributes = array(
         'actiontype', 'align', 'close', 'columnalign', 'columnalign',
         'columnalign', 'columnlines', 'columnspacing', 'columnspan', 'depth',
@@ -119,6 +110,11 @@ class Whitelist
         'xlink:show', 'xlink:type', 'xmlns', 'xmlns:xlink'
     );
     
+    /**
+     * Array of attributes generally allowed in SVG
+     *
+     * @var array
+     */
     public static $svgAttributes = array(
         'accent-height', 'accumulate', 'additive', 'alphabetic', 'arabic-form',
         'ascent', 'attributeName', 'attributeType', 'baseProfile', 'bbox', 'begin',
@@ -147,21 +143,41 @@ class Whitelist
         'y2', 'zoomAndPan'
     );
     
+    /**
+     * Array of attributes whose value is generally a URI
+     *
+     * @var array
+     */
     public static $attributesWithUriValue = array(
         'href', 'src', 'cite', 'action', 'longdesc', 'xlink:href', 'xml:base'
     );
     
+    /**
+     * Array of SVG attributes whose value may be a URI
+     *
+     * @var array
+     */
     public static $svgAttributeValueAllowsRef = array(
         'clip-path', 'color-profile', 'cursor', 'fill', 'filter', 'marker',
         'marker-start', 'marker-mid', 'marker-end', 'mask', 'stroke'
     );
     
+    /**
+     * Array of SVG attributes whose value may be a local URI
+     *
+     * @var array
+     */
     public static $svgAllowLocalHref = array(
         'altGlyph', 'animate', 'animateColor', 'animateMotion', 'animateTransform',
         'cursor', 'feImage', 'filter', 'linearGradient', 'pattern', 'radialGradient',
         'textpath', 'tref', 'set', 'use'
     );
     
+    /**
+     * Array of generally acceptable CSS properties
+     *
+     * @var array
+     */
     public static $acceptableCssProperties = array(
         'azimuth', 'background-color', 'border-bottom-color', 'border-collapse',
         'border-color', 'border-left-color', 'border-right-color', 'border-top-color',
@@ -174,6 +190,11 @@ class Whitelist
         'vertical-align', 'voice-family', 'volume', 'white-space', 'width'
     );
     
+    /**
+     * Array of generally acceptable CSS keywords used with property values
+     *
+     * @var array
+     */
     public static $acceptableCssKeywords = array(
         'auto', 'aqua', 'black', 'block', 'blue', 'bold', 'both', 'bottom', 'brown',
         'center', 'collapse', 'dashed', 'dotted', 'fuchsia', 'gray', 'green',
@@ -182,22 +203,43 @@ class Whitelist
         'silver', 'teal', 'top', 'transparent', 'underline', 'white', 'yellow'
     );
     
+    /**
+     * Array of generally acceptable CSS keywords used with property values
+     * in SVG
+     *
+     * @var array
+     */
     public static $acceptableSvgProperties = array(
         'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width',
         'stroke-linecap', 'stroke-linejoin', 'stroke-opacity'
     );
     
+    /**
+     * Array of generally acceptable URI protocols
+     *
+     * @var array
+     */
     public static $acceptableProtocols = array(
         'ed2k', 'ftp', 'http', 'https', 'irc', 'mailto', 'news', 'gopher', 'nntp',
         'telnet', 'webcal', 'xmpp', 'callto', 'feed', 'urn', 'aim', 'rsync', 'tag',
         'ssh', 'sftp', 'rtsp', 'afs'
     );
     
+    /**
+     * Array of elements which may be self-closing (i.e. contain no content)
+     *
+     * @var array
+     */
     public static $voidElements = array(
         'base', 'link', 'meta', 'hr', 'br', 'img', 'embed', 'param', 'area',
         'col', 'input'
     );
     
+    /**
+     * Array of elements required to be safe when using PHP DOM (libxml2)
+     *
+     * @var array
+     */
     public static $tagsSafeWithLibxml2 = array('html', 'head', 'body');
 
 }

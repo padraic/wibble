@@ -24,17 +24,44 @@
 namespace Wibble\Filter;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 abstract class AbstractFilter implements Filterable
 {
 
-    const GO = 'continue';
+    /**
+     * Constant representing a GO message
+     */
+    const GO = 'go';
     
+    /**
+     * Constant representing a STOP message
+     */
     const STOP = 'stop';
     
+    /**
+     * Dictates the direction of filtering
+     *
+     * @var string
+     */
     protected $_direction = 'top_down';
     
+    /**
+     * If set to an array, represents a user whitelist which overrides the
+     * the internal whitelist
+     *
+     * @var array
+     */
     protected $_userWhitelist = null;
     
+    /**
+     * Constructor; accepts filtering direction as sole parameter
+     *
+     * @param string $direction
+     */
     public function __construct($direction = null)
     {
         if (!is_null($direction)) {
@@ -42,10 +69,22 @@ abstract class AbstractFilter implements Filterable
         }
     }
     
-    public function traverse(\DOMNode $node) {
-        $this->_traverseTopDown($node);
+    /**
+     * Traverses the DOM and applies the filter to each encountered node
+     *
+     * @param \DOMNode $node
+     * @return void
+     */
+    public function traverse(\DOMNode $node)
+    {
+        $this->_traverseTopDown($node); //TODO - test bottom up
     }
     
+    /**
+     * Set the filter traversal direction
+     *
+     * @param string $direction
+     */
     public function setDirection($direction)
     {
         if ($direction !== 'top_down' && $direction !== 'bottom_up') {
@@ -54,14 +93,27 @@ abstract class AbstractFilter implements Filterable
         $this->_direction = $direction;
     }
     
+    /**
+     * Some filters may need specific render option changes. This empty method
+     * optionally allows filters to return option arrays to merge into the
+     * current options
+     *
+     * @return array
+     */
     public function getRenderOptions()
     {
     }
     
-    public function setUserWhitelist($whitelist)
+    /**
+     * Set a custom whitelist of tags and attributes which overrides the built-in
+     * sanitisation whitelist for all any filter utilising sanitisation routines.
+     * The whitelist is of the form array('tagName'=>array('attr1', 'attr2'), ...).
+     * For DOM purposes, the html and body tags are always whitelisted.
+     *
+     * @param array $whitelist
+     */
+    public function setUserWhitelist(array $whitelist)
     {
-        // We need to allow base tags or DOM cannot render!!
-        // These are stripped if exporting from Wibble\HTML\Fragment
         if (!array_key_exists('html', $whitelist)) {
             $whitelist['html'] = array();
         }
@@ -71,11 +123,24 @@ abstract class AbstractFilter implements Filterable
         $this->_userWhitelist = $whitelist;
     }
     
+    /**
+     * Retrieve the user defined whitelist or NULL if not set
+     *
+     * @return array|null
+     */
     public function getUserWhitelist()
     {
         return $this->_userWhitelist;
     }
     
+    /**
+     * Traverse the DOM from the top down. If the filter used returns a STOP
+     * message, processing of the current node is terminated. This allows for
+     * terminating node processing, where the node has been deleted or irrevocably
+     * altered so that it no longer can or needs processing.
+     *
+     * @param \DOMNode $node
+     */
     protected function _traverseTopDown(\DOMNode $node)
     {
         if ($this->filter($node) == self::STOP) {
@@ -89,6 +154,14 @@ abstract class AbstractFilter implements Filterable
         }
     }
     
+    /**
+     * Traverse the DOM from the bottom up. If the filter used returns a STOP
+     * message, processing of the current node is terminated. This allows for
+     * terminating node processing, where the node has been deleted or irrevocably
+     * altered so that it no longer can or needs processing.
+     *
+     * @param \DOMNode $node
+     */
     protected function _traverseBottomUp(\DOMNode $node)
     {
         $children = $node->childNodes;
@@ -102,6 +175,19 @@ abstract class AbstractFilter implements Filterable
         }
     }
     
+    /**
+     * Sanitises the given DOM node. Sanitisation may return either a GO or STOP
+     * message. A GO message indicates the current node is a valid element, text
+     * or CDATA node. Element tag names are checked against the internal or user
+     * defined whitelist. Attributes are also checked against the whitelist. A
+     * STOP message indicates an element tag name is not on the whitelist, and
+     * allows filters to take an appropriate action such as stripping or escaping
+     * the offending node. Attributes which fail the whitelist or internal
+     * sanitisation are always stripped.
+     *
+     * @param \DOMNode $node
+     * @return string Message indicating GO or STOP
+     */
     protected function _sanitize(\DOMNode $node)
     {
         $userWhitelist = $this->getUserWhitelist();
@@ -134,6 +220,14 @@ abstract class AbstractFilter implements Filterable
         return self::STOP;
     }
     
+    /**
+     * Sanitise the attributes of the given nodes according to the internal
+     * whitelist and sanitisation checks. A user whitelist may optionally be passed
+     * to replace the internal whitelist.
+     *
+     * @param \DOMNode $node
+     * @param array $userWhitelist
+     */
     protected function _sanitizeAttributes(\DOMNode $node, array $userWhitelist = null)
     {
         if ($userWhitelist === null) {
@@ -187,6 +281,12 @@ abstract class AbstractFilter implements Filterable
         }
     }
     
+    /**
+     * Sanitise CSS contained by elements and/or attributes.
+     *
+     * @param string $css The CSS to sanitise
+     * @return string The clean sanitised CSS
+     */
     protected function _sanitizeCSS($css)
     {
         $css = preg_replace('/url\s*\(\s*[^\s)]+?\s*\)\s*/', ' ', $css);

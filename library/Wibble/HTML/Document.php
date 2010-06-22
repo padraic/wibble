@@ -24,17 +24,35 @@
 namespace Wibble\HTML;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Document
 {
 
+    /**
+     * HTML Doctype constants
+     */
     const XHTML11             = 'XHTML11';
     const XHTML1_STRICT       = 'XHTML1_STRICT';
     const XHTML1_TRANSITIONAL = 'XHTML1_TRANSITIONAL';
     const HTML4_STRICT        = 'HTML4_STRICT';
     const HTML4_TRANSITIONAL  = 'HTML4_TRANSITIONAL';
 
+    /**
+     * The \DOMDocument generated from HTML input
+     *
+     * @type \DOMDocument
+     */
     protected $_dom = null;
     
+    /**
+     * Options for this class
+     *
+     * @type array
+     */
     protected $_options = array(
         'disable_tidy' => false,
         'doctype' => self::HTML4_TRANSITIONAL,
@@ -42,6 +60,12 @@ class Document
         'output_encoding' => 'utf-8',
     );
 
+    /**
+     * Constructor; instantiates object using source markup and given options
+     *
+     * @param string $markup
+     * @param array $options
+     */
     public function __construct($markup, array $options = null)
     {
         if (empty($markup)) $markup = ' ';
@@ -51,6 +75,15 @@ class Document
         $this->_load($markup);
     }
     
+    /**
+     * Accepts a \Wibble\Filter\Filterable object or the name of one such
+     * built-on class. If omitted, the default filter utilised is
+     * \Wibble\Filter\Strip. Optionally, one may pass in a whitelist to
+     * override the internal whitelists.
+     *
+     * @param string|\Wibble\Filter\Filterable|null $filter
+     * @param array|null $whitelist
+     */
     public function filter($filter = null, array $whitelist = null)
     {
         if (is_array($filter) || empty($filter)) {
@@ -71,11 +104,23 @@ class Document
         return $this;
     }
     
+    /**
+     * Return the \DOMDocument generated when this class is instantiated
+     *
+     * @return \DOMDocument
+     */
     public function getDOM()
     {
         return $this->_dom;
     }
 
+    /**
+     * Resolve the \Wibble\Filter\Filterable object to use based on the user
+     * parameters to \Wibble\HTML\Document::filter()
+     *
+     * @return \Wibble\Filter\Filterable
+     * @throws \Wibble\Exception
+     */
     protected function _resolve($filter)
     {
         if (is_string($filter)) {
@@ -93,11 +138,21 @@ class Document
         throw new Wibble\Exception('Filter does not exist: ' . (string) $filter);
     }
     
+    /**
+     * Convert this Wibble\HTML\Document to serialised HTML/XHTML string
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->toString();
     }
     
+    /**
+     * Convert this Wibble\HTML\Document to serialised HTML/XHTML string
+     *
+     * @return string
+     */
     public function toString()
     {
         $output = $this->_dom->saveHTML();
@@ -134,6 +189,12 @@ class Document
         return trim((string) $tidy);
     }
     
+    /**
+     * Based on instance parameters, load the source markup into a \DOMDocument
+     *
+     * @param string $markup
+     * @return void
+     */
     protected function _load($markup) {
         $dom = new \DOMDocument;
         $dom->preserveWhitespace = false;

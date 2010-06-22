@@ -24,14 +24,34 @@
 namespace Wibble\Filter;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Strip extends AbstractFilter
 {
 
+    /**
+     * Ensure default whitelist accepts html/body tags which are inserted
+     * when \DOMDocument loads the HTML document or fragment and therefore
+     * must be traversed at a minimum to get to the core content we want
+     * to filter.
+     *
+     * @var array|null
+     */
     protected $_userWhitelist = array(
         'html' => array(),
-        'body' => array()
+        'body' => array(),
+        'head' => array()
     );
     
+    /**
+     * Filter a \DOMNode according to this filter's logic
+     *
+     * @param \DOMNode $node
+     * @return string|null If a string, it should be a GO or STOP message
+     */
     public function filter(\DOMNode $node)
     {
         if ($this->_sanitize($node) == AbstractFilter::GO) {

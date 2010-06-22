@@ -24,9 +24,20 @@
 namespace Wibble\Filter;
 use Wibble;
 
+/**
+ * @package    Wibble
+ * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
+ * @license    http://github.com/padraic/wibble/blob/master/LICENSE New BSD License
+ */
 class Prune extends AbstractFilter
 {
     
+    /**
+     * Filter a \DOMNode according to this filter's logic
+     *
+     * @param \DOMNode $node
+     * @return string|null If a string, it should be a GO or STOP message
+     */
     public function filter(\DOMNode $node)
     {
         if ($this->_sanitize($node) == AbstractFilter::GO) {
