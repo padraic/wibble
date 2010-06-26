@@ -156,7 +156,7 @@ class Document
     public function toString()
     {
         $output = $this->_dom->saveHTML();
-        $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
+        $output = $this->_htmlEntityDecode($output, 'UTF-8');
         if (!class_exists('\\tidy') && !$this->_options['disable_tidy']) {
             throw new Wibble\Exception(
                 'It is highly recommended that Wibble operate with support from'
@@ -166,29 +166,11 @@ class Document
                 . ' option to FALSE'
             );
         } elseif ($this->_options['disable_tidy']) {
+            $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
             return $output;
         }
-        $tidy = new \tidy;
-        $config = array(
-            'hide-comments' => true,
-            'input-encoding' => $this->_getTidyEncodingFor($this->_options['input_encoding']),
-            'output-encoding' => $this->_getTidyEncodingFor($this->_options['output_encoding']),
-            'wrap' => 0,
-            'preserve-entities' => true
-        );
-        if (preg_match("/XHTML/", $this->_options['doctype'])) {
-            $config['output-xhtml'] = true;
-        } else {
-            $config['output-html'] = true;
-        }
-        if (preg_match("/TRANSITIONAL/", $this->_options['doctype'])) {
-            $config['doctype'] = 'transitional';
-        } else {
-            $config['doctype'] = 'strict';
-        }
-        $tidy->parseString($output, $config);
-        $tidy->cleanRepair();
-        return trim((string) $tidy);
+        $output = $this->_applyTidy($output, true);
+        return $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
     }
     
     /**
@@ -268,6 +250,41 @@ class Document
             $string
         );
         return $string;
+    }
+    
+    /**
+     * Apply Tidy to output
+     *
+     * @param string $output
+     * @return string
+     */
+    protected function _applyTidy($output, $bodyOnly = false)
+    {
+        $tidy = new \tidy;
+        $config = array(
+            'hide-comments' => true,
+            'input-encoding' => 'utf8',
+            'output-encoding' => 'utf8',
+            'wrap' => 0,
+            'preserve-entities' => true
+        );
+        if ($bodyOnly) {
+            $config['show-body-only'] = true;
+        }
+        if (preg_match("/XHTML/", $this->_options['doctype'])) {
+            $config['output-xhtml'] = true;
+        } else {
+            $config['output-html'] = true;
+        }
+        if (preg_match("/TRANSITIONAL/", $this->_options['doctype'])) {
+            $config['doctype'] = 'transitional';
+        } else {
+            $config['doctype'] = 'strict';
+        }
+        $tidy->parseString($output, $config);
+        $tidy->cleanRepair();
+        $return = trim((string) $tidy);
+        return $return;
     }
     
 }

@@ -56,29 +56,8 @@ class Fragment extends Document
             $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
             return $output;
         }
-        $tidy = new \tidy;
-        $config = array(
-            'hide-comments' => true,
-            'show-body-only' => true,
-            'input-encoding' => 'utf8',
-            'output-encoding' => 'utf8',
-            'wrap' => 0,
-            'preserve-entities' => true
-        );
-        if (preg_match("/XHTML/", $this->_options['doctype'])) {
-            $config['output-xhtml'] = true;
-        } else {
-            $config['output-html'] = true;
-        }
-        if (preg_match("/TRANSITIONAL/", $this->_options['doctype'])) {
-            $config['doctype'] = 'transitional';
-        } else {
-            $config['doctype'] = 'strict';
-        }
-        $tidy->parseString($output, $config);
-        $tidy->cleanRepair();
-        $return = trim((string) $tidy);
-        return $output = Wibble\Utility::convertFromUTF8($return, $this->_options['output_encoding']);;
+        $output = $this->_applyTidy($output, true);
+        return $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
     }
     
     /**
