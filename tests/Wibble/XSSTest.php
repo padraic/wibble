@@ -54,9 +54,6 @@ class XSSTest extends \PHPUnit_Framework_TestCase
                 $fragment = new Wibble\HTML\Fragment($code);
             //}
             $fragment->filter();
-            //if (md5($attack->name) == '9951711f2562c125b33cfca1c6dae735') {
-            //    var_dump($code); var_dump($fragment->toString()); exit;
-            //}
             $results[md5($attack->name)] = $fragment->toString();
         }
         foreach ($results as $hash=>$result) {
@@ -153,9 +150,6 @@ class XSSTest extends \PHPUnit_Framework_TestCase
             //}
             $fragment = new Wibble\HTML\Fragment($code, array('disable_tidy'=>true));
             $fragment->filter();
-            //if (md5($attack->name) == '0ff2a0bf27978ee5ffa85009caacf63f') {
-            //    var_dump($code); var_dump($fragment->toString()); exit;
-            //}
             $results[md5($attack->name)] = $fragment->toString();
         }
         foreach ($results as $hash=>$result) {
@@ -237,6 +231,14 @@ class XSSTest extends \PHPUnit_Framework_TestCase
                     $this->fail('XSS Attack sanitisation failed on ' . $hash);
             }
         }
+    }
+    
+    public function testUTF7Vulnerability()
+    {
+        $input = iconv('UTF-8', 'UTF-7', '<script>alert("xss");</script>');
+        $doc = new Wibble\HTML\Fragment($input);
+        $doc->filter();
+        $this->assertEquals('+ADw-script+AD4-alert(+ACI-xss+ACI)+ADsAPA-/script+AD4-', $doc->toString());
     }
 
 }
