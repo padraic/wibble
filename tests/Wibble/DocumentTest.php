@@ -144,5 +144,51 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
         $doc = new Wibble\HTML\Document($this->fragment, array('disable_tidy'=>true));
         $doc->toString();
     }
+    
+    /**
+     * Generic document tests which should work with Fragment (no need to duplicate)
+     * to Fragment class - might split to new test file separately for encoding support
+     */
+    
+    public function testHandlesSimpleEncodingPreservation()
+    {
+        $markup = iconv('UTF-8', 'ISO-8859-15', '<p>€</p>');
+        $expected = iconv('UTF-8', 'ISO-8859-15', '€');
+        $fragment = new Wibble\HTML\Fragment($markup, array(
+            'input_encoding'=>'ISO-8859-15',
+            'output_encoding'=>'ISO-8859-15'
+        ));
+        $fragment->filter();
+        $this->assertEquals($expected, $fragment->toString());
+    }
+    
+    public function testHandlesSimpleEncodingConversion()
+    {
+        $markup = iconv('UTF-8', 'ISO-8859-15', '<p>€</p>');
+        $expected = '€'; // UTF-8
+        $fragment = new Wibble\HTML\Fragment($markup, array(
+            'input_encoding'=>'ISO-8859-15',
+            'output_encoding'=>'UTF-8'
+        ));
+        $fragment->filter();
+        $this->assertEquals($expected, $fragment->toString());
+    }
+    
+    /**
+     * Personally I'd prefer this didn't happen, but DOM has its own ideas and
+     * DOM isn't messed around by hanging quotes. Nonetheless, merging such
+     * output with non-filtered HTML would raise the risk of quote escaping a bit.
+     */
+    public function testEncodingHandlingTranslatesQuoteEquivelantsToRealQuotes()
+    {
+        $markup = iconv('UTF-8', 'ISO-8859-15', '<p>\'"&quot;&#039;</p>');
+        $expected = '\'""\'';
+        $fragment = new Wibble\HTML\Fragment($markup, array(
+            'input_encoding'=>'ISO-8859-15',
+            'output_encoding'=>'UTF-8'
+        ));
+        $fragment->filter();
+        $this->assertEquals($expected, $fragment->toString());
+    }
 
 }

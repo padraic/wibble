@@ -56,8 +56,8 @@ class Document
     protected $_options = array(
         'disable_tidy' => false,
         'doctype' => self::HTML4_TRANSITIONAL,
-        'input_encoding' => 'utf-8',
-        'output_encoding' => 'utf-8',
+        'input_encoding' => 'UTF-8',
+        'output_encoding' => 'UTF-8',
     );
 
     /**
@@ -129,7 +129,7 @@ class Document
         if ($filter instanceof Wibble\Filter\Filterable) {
             return $filter;
         } elseif (is_string($filter)) {
-            if (in_array($filter, array('Strip', 'Escape', 'Prune', 'Cull'))) { // delegate out from explicit strings
+            if (in_array($filter, array('Strip', 'Escape', 'Prune', 'Cull'))) {
                 $class = 'Wibble\\Filter\\' . $filter;
                 $return = new $class;
                 return $return;
@@ -156,6 +156,7 @@ class Document
     public function toString()
     {
         $output = $this->_dom->saveHTML();
+        $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
         if (!class_exists('\\tidy') && !$this->_options['disable_tidy']) {
             throw new Wibble\Exception(
                 'It is highly recommended that Wibble operate with support from'
@@ -170,9 +171,10 @@ class Document
         $tidy = new \tidy;
         $config = array(
             'hide-comments' => true,
-            'input-encoding' => str_replace('-', '', $this->_options['input_encoding']),
-            'output-encoding' => str_replace('-', '', $this->_options['output_encoding']),
+            'input-encoding' => $this->_getTidyEncodingFor($this->_options['input_encoding']),
+            'output-encoding' => $this->_getTidyEncodingFor($this->_options['output_encoding']),
             'wrap' => 0,
+            'preserve-entities' => true
         );
         if (preg_match("/XHTML/", $this->_options['doctype'])) {
             $config['output-xhtml'] = true;
@@ -196,14 +198,76 @@ class Document
      * @return void
      */
     protected function _load($markup) {
+        $markup = Wibble\Utility::convertToUTF8(
+            $markup,
+            $this->_options['input_encoding']
+        );
+        $markup = Wibble\Utility::insertCharset($markup, 'UTF-8');
         $dom = new \DOMDocument;
         $dom->preserveWhitespace = false;
-        $dom->formatOutput = true;
-        $dom->recover = 1;
         libxml_use_internal_errors(true);
         $dom->loadHTML($markup);
         libxml_use_internal_errors(false);
         $this->_dom = $dom;
+    }
+    
+    /**
+     * Attempts to map a typical encoding name (with mid-slash) to one of the
+     * oft custom named encoding parameters accepted by tidy.
+     * Note: Technically this is irrevelant since all tidy ops should operate
+     * using utf8 once refactoring of this class is complete.
+     *
+     * @param string $encoding Full name of encoding with slash divisor (e.g. UTF-8)
+     * @return string
+     */
+    protected function _getTidyEncodingFor($encoding) {
+        $encoding = strtolower($encoding);
+        switch ($encoding) {
+            case 'iso-8859-1':
+                $return = 'latin1';
+                break;
+            case 'iso-8859-15':
+                $return = 'latin0';
+                break;
+            default:
+                $return = str_replace('-', '', $encoding);
+        }
+        return $return;
+    }
+    
+    /**
+     * Apply html_entity_decode() to a string while re-entitising HTML
+     * special char entities to prevent them from being decoded back to their
+     * unsafe original forms.
+     *
+     * This relies on html_entity_decode() not translating entities when
+     * doing so leaves behind another entity, e.g. &amp;gt; if decoded would
+     * create &gt; which is another entity itself. This seems to escape the
+     * usual behaviour where any two paired entities creating a HTML tag are
+     * usually decoded, i.e. a lone &gt; is not decoded, but &lt;foo&gt; would
+     * be decoded to <foo> since it creates a full tag.
+     *
+     * Note: This function is poorly explained in the manual - which is really
+     * bad given its potential for misuse on user input already escaped elsewhere.
+     *
+     * @param string $string
+     * @param string $encoding
+     * @return string
+     */
+    protected function _htmlEntityDecode($string, $encoding)
+    {
+        $string = str_replace(
+            array('&gt;', '&lt;', '&amp;', '&quot;', '&#039;'),
+            array('&amp;gt;', '&amp;lt;', '&amp;amp;', '&amp;quot;', '&amp;#039;'),
+            $string
+        );
+        $string = html_entity_decode($string, ENT_NOQUOTES, $encoding);
+        $string = str_replace(
+            array('&amp;gt;', '&amp;lt;', '&amp;amp;', '&amp;quot;', '&amp;#039;'),
+            array('&gt;', '&lt;', '&amp;', '&quot;', '&#039;'),
+            $string
+        );
+        return $string;
     }
     
 }

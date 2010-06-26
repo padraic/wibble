@@ -33,9 +33,9 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
         $this->count = 0;
         $this->fragment = '<span>hello</span><span>goodbye</span>';
         $this->document = '<html><head><link></link></head><body><span>hello</span><span>goodbye</span></body></html>';
-        $this->fragmentNodeCount = 4 + 2; // +2 refers to #html and #body added by libxml2 to fragments
+        $this->fragmentNodeCount = 4 + 4;
         $this->documentNodeCount = 8;
-        $this->fragmentTopDownStopCount = 2 - 1; // -1 refers again to libxml2's additions to fragments
+        $this->fragmentTopDownStopCount = 2 - 1;
         $this->documentTopDownStopCount = 1;
         $self =& $this;
         $this->filterGo = new Wibble\Filter\Closure(function($node) use ($self) {

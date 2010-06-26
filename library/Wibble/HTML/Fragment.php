@@ -43,6 +43,7 @@ class Fragment extends Document
         $result = $xpath->query('/html/body');
         if ($result->length == 0) return '';
         $output = $this->_getInnerHTML($result->item(0));
+        $output = $this->_htmlEntityDecode($output, 'UTF-8');
         if (!class_exists('\\tidy') && !$this->_options['disable_tidy']) {
             throw new Wibble\Exception(
                 'It is highly recommended that Wibble operate with support from'
@@ -52,15 +53,17 @@ class Fragment extends Document
                 . ' option to FALSE'
             );
         } elseif ($this->_options['disable_tidy']) {
+            $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
             return $output;
         }
         $tidy = new \tidy;
         $config = array(
             'hide-comments' => true,
             'show-body-only' => true,
-            'input-encoding' => str_replace('-', '', $this->_options['input_encoding']),
-            'output-encoding' => str_replace('-', '', $this->_options['output_encoding']),
+            'input-encoding' => 'utf8',
+            'output-encoding' => 'utf8',
             'wrap' => 0,
+            'preserve-entities' => true
         );
         if (preg_match("/XHTML/", $this->_options['doctype'])) {
             $config['output-xhtml'] = true;
@@ -74,7 +77,8 @@ class Fragment extends Document
         }
         $tidy->parseString($output, $config);
         $tidy->cleanRepair();
-        return trim((string) $tidy);
+        $return = trim((string) $tidy);
+        return $output = Wibble\Utility::convertFromUTF8($return, $this->_options['output_encoding']);;
     }
     
     /**
@@ -94,7 +98,8 @@ class Fragment extends Document
                 $dom->appendChild($dom->importNode($child, true));
             }
         }
-        return trim($dom->saveHTML());
+        $output = $dom->saveHTML();
+        return trim($output);
     }
 
 }

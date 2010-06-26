@@ -81,5 +81,76 @@ class Utility
         }
         return $string;
     }
+    
+    /**
+     * Convert a string (e.g. HTML input) to UTF-8, used mainly prior to importing
+     * HTML into \DOMDocument and assuming the string is not already supposed to
+     * be UTF-8.
+     *
+     * TODO: Support stuff like SHIFT-JIS
+     *
+     * @param string $string
+     * @param string $encoding
+     * @return string
+     */
+    public static function convertToUTF8($string, $encoding)
+    {
+        $encoding = strtoupper($encoding);
+        if ($encoding == 'UTF-8') {
+            return $string;
+        }
+        $string = iconv($encoding, 'UTF-8//IGNORE', $string);
+        if ($string === false) {
+            throw new Wibble\Exception('Encoding not supported: ' . $encoding);
+        }
+        return $string;
+    }
+    
+    /**
+     * Convert a string (e.g. HTML input) from UTF-8, used mainly after exporting
+     * HTML from \DOMDocument and assuming the string is not already supposed to
+     * be UTF-8. Note that the method of conversion will attempt to add a replacement
+     * for any UTF-8 character which cannot be directly represented in the encoding
+     * we're converting to. For example, "€" would be converted to "EUR" for
+     * ISO-8859-1.
+     *
+     * TODO: Support stuff like SHIFT-JIS
+     *
+     * @param string $string
+     * @param string $encoding
+     * @return string
+     */
+    public static function convertFromUTF8($string, $encoding)
+    {
+        $encoding = strtoupper($encoding);
+        if ($encoding == 'UTF-8') {
+            return $string;
+        }
+        $string = iconv('UTF-8', $encoding . '//TRANSLIT', $string);
+        if ($string === false) {
+            throw new Wibble\Exception('Encoding not supported: ' . $encoding);
+        }
+        return $string;
+    }
+    
+    /**
+     * Add charset to ensure \DOMDocument::loadHTML() does not default to
+     * ISO-8859-1 - this is a placeholder only workable on fragments for now.
+     *
+     * TODO: Replace this quickie stub with a complete functional version
+     *
+     * @param string $html
+     * @param string $encoding
+     */
+    public static function insertCharset($html, $encoding)
+    {
+        if (preg_match('/^<html/i', $html)) return $html;
+        $encoding = strtoupper($encoding);
+        $html = <<<HTML
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=$encoding">
+</head><body>$html</body></html>
+HTML;
+        return $html;
+    }
 
 }

@@ -217,6 +217,9 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
      * I am not writing 500+ tests individually ;)
      */
     
+    /**
+     * @group sanitise_escape
+     */
     public function testAllowsAcceptableElements()
     {
         $acceptableTags = array_merge(

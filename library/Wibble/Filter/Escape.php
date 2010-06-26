@@ -45,8 +45,9 @@ class Escape extends AbstractFilter
         }
         $replacementText = Wibble\Utility::nodeToString($node);
         $replacementNode = $node->ownerDocument->createTextNode($replacementText);
-        $node->parentNode->insertBefore($replacementNode, $node);
-        $node->parentNode->removeChild($node);
+        $parent = $node->parentNode;
+        $parent->insertBefore($replacementNode, $node);
+        $parent->removeChild($node);
     }
 
 }

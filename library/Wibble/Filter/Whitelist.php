@@ -90,7 +90,8 @@ class Whitelist
         'multiple', 'name', 'nohref', 'noshade', 'nowrap', 'prompt', 'readonly',
         'rel', 'rev', 'rows', 'rowspan', 'rules', 'scope', 'selected', 'shape',
         'size', 'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target',
-        'title', 'type', 'usemap', 'valign', 'value', 'vspace', 'width', 'xml:lang'
+        'title', 'type', 'usemap', 'valign', 'value', 'vspace', 'width', 'xml:lang',
+        'http-equiv'
     );
     
     /**
@@ -240,6 +241,6 @@ class Whitelist
      *
      * @var array
      */
-    public static $tagsSafeWithLibxml2 = array('html', 'head', 'body');
+    public static $tagsSafeWithLibxml2 = array('html', 'head', 'body', 'meta');
 
 }
