@@ -210,7 +210,7 @@ class Document
                 $return = 'latin1';
                 break;
             case 'iso-8859-15':
-                $return = 'latin0';
+                $return = 'latin0'; // Latin-0/ISO-8859-15 seems broken in ext/tidy!
                 break;
             default:
                 $return = str_replace('-', '', $encoding);
@@ -232,6 +232,8 @@ class Document
      *
      * Note: This function is poorly explained in the manual - which is really
      * bad given its potential for misuse on user input already escaped elsewhere.
+     * Stackoverflow is littered with advice to use this function in the precise
+     * way that would lead to user input being capable of injecting arbitrary HTML.
      *
      * @param string $string
      * @param string $encoding
