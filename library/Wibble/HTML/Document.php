@@ -163,7 +163,8 @@ class Document
                 . ' the PHP Tidy extension to ensure output wellformedness. If'
                 . ' you are unable to install this extension you may explicitly'
                 . ' disable Tidy support by setting the disable_tidy configuration'
-                . ' option to FALSE'
+                . ' option to FALSE. Without ext/tidy enabled, output is in no'
+                . ' way guaranteed to comply entirely to the target HTML standard.'
             );
         } elseif ($this->_options['disable_tidy']) {
             $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);

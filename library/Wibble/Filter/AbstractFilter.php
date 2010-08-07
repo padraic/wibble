@@ -120,6 +120,10 @@ abstract class AbstractFilter implements Filterable
         if (!array_key_exists('body',$whitelist)) {
             $whitelist['body'] = array();
         }
+        if (!array_key_exists('head',$whitelist)) {
+            $whitelist['head'] = array();
+            $whitelist['meta'] = array('http-equiv','content');
+        }
         $this->_userWhitelist = $whitelist;
     }
     
