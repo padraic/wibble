@@ -316,7 +316,7 @@ abstract class AbstractFilter implements Filterable
                     }
                 }
                 $clean[] = $pairing[1] . ': ' . $pairing[2] . ';';
-            } elseif (in_array($pairing[1], Whitelist::$allowedSvgProperties)) {
+            } elseif (in_array($pairing[1], Whitelist::$acceptableSvgProperties)) {
                 $clean[] = $pairing[1] . ': ' . $pairing[2] . ';';
             }
         }
