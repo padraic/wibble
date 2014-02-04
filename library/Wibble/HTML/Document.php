@@ -170,7 +170,7 @@ class Document
             $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
             return $output;
         }
-        $output = $this->_applyTidy($output, true);
+        $output = $this->_applyTidy($output);
         return $output = Wibble\Utility::convertFromUTF8($output, $this->_options['output_encoding']);
     }
     
